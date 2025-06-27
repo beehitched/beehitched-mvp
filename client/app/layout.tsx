@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   description: 'Plan your perfect wedding with our elegant, intuitive wedding planning platform. Manage tasks, guests, and collaborate with loved ones.',
   keywords: 'wedding planning, wedding organizer, wedding tasks, guest management, wedding collaboration',
   authors: [{ name: 'BeeHitched Team' }],
+  icons: {
+    icon: '/icon.svg',
+  },
   openGraph: {
     title: 'BeeHitched - Wedding Planning Made Simple',
     description: 'Plan your perfect wedding with our elegant, intuitive wedding planning platform.',

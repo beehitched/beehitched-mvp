@@ -15,7 +15,8 @@ import {
   UserPlus,
   Shield,
   MessageSquare,
-  Clock
+  Clock,
+  ChevronDown
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -72,6 +73,13 @@ export default function HomePage() {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)
   }
 
+  const scrollToFeatures = () => {
+    const featuresSection = document.querySelector('#features-section')
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -91,7 +99,7 @@ export default function HomePage() {
               <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
                 Elegant, intuitive wedding planning that makes your special day stress-free and beautiful.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 {user ? (
                   <Link href="/dashboard" className="btn-primary text-lg px-8 py-4">
                     Go to Dashboard
@@ -107,6 +115,32 @@ export default function HomePage() {
                   </>
                 )}
               </div>
+              
+              {/* Animated Scroll Down CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="flex flex-col items-center"
+              >
+                <motion.button
+                  onClick={scrollToFeatures}
+                  className="group flex flex-col items-center text-white/80 hover:text-white transition-colors cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="text-sm font-medium mb-2 group-hover:text-gold-200 transition-colors">
+                    Learn More
+                  </span>
+                  <motion.div
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-6 h-6"
+                  >
+                    <ChevronDown className="w-6 h-6" />
+                  </motion.div>
+                </motion.button>
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -129,7 +163,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section id="features-section" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-serif font-bold text-gray-900 mb-4">
