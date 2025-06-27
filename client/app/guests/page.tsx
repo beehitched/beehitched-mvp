@@ -30,7 +30,7 @@ interface Guest {
   email: string
   phone: string
   address: string
-  rsvpStatus: 'pending' | 'attending' | 'declined' | 'maybe'
+  rsvpStatus: 'Pending' | 'Attending' | 'Not Attending' | 'Maybe'
   plusOne: boolean
   plusOneName: string
   dietaryRestrictions: string
@@ -40,10 +40,10 @@ interface Guest {
 }
 
 const rsvpStatuses = [
-  { value: 'pending', label: 'Pending', color: 'bg-gray-100 text-gray-800' },
-  { value: 'attending', label: 'Attending', color: 'bg-green-100 text-green-800' },
-  { value: 'declined', label: 'Declined', color: 'bg-red-100 text-red-800' },
-  { value: 'maybe', label: 'Maybe', color: 'bg-yellow-100 text-yellow-800' }
+  { value: 'Pending', label: 'Pending', color: 'bg-gray-100 text-gray-800' },
+  { value: 'Attending', label: 'Attending', color: 'bg-green-100 text-green-800' },
+  { value: 'Not Attending', label: 'Not Attending', color: 'bg-red-100 text-red-800' },
+  { value: 'Maybe', label: 'Maybe', color: 'bg-yellow-100 text-yellow-800' }
 ]
 
 const groups = [
@@ -76,7 +76,7 @@ export default function GuestsPage() {
     email: '',
     phone: '',
     address: '',
-    rsvpStatus: 'pending' as const,
+    rsvpStatus: 'Pending' as const,
     plusOne: false,
     plusOneName: '',
     dietaryRestrictions: '',
@@ -112,7 +112,7 @@ export default function GuestsPage() {
             email: 'sarah.johnson@email.com',
             phone: '(555) 123-4567',
             address: '123 Main St, New York, NY',
-            rsvpStatus: 'attending',
+            rsvpStatus: 'Attending',
             plusOne: true,
             plusOneName: 'Mike Johnson',
             dietaryRestrictions: 'Vegetarian',
@@ -126,7 +126,7 @@ export default function GuestsPage() {
             email: 'david.smith@email.com',
             phone: '(555) 987-6543',
             address: '456 Oak Ave, Los Angeles, CA',
-            rsvpStatus: 'pending',
+            rsvpStatus: 'Pending',
             plusOne: false,
             plusOneName: '',
             dietaryRestrictions: '',
@@ -140,7 +140,7 @@ export default function GuestsPage() {
             email: 'emily.davis@email.com',
             phone: '(555) 456-7890',
             address: '789 Pine Rd, Chicago, IL',
-            rsvpStatus: 'declined',
+            rsvpStatus: 'Not Attending',
             plusOne: false,
             plusOneName: '',
             dietaryRestrictions: '',
@@ -159,7 +159,7 @@ export default function GuestsPage() {
           email: 'sarah.johnson@email.com',
           phone: '(555) 123-4567',
           address: '123 Main St, New York, NY',
-          rsvpStatus: 'attending',
+          rsvpStatus: 'Attending',
           plusOne: true,
           plusOneName: 'Mike Johnson',
           dietaryRestrictions: 'Vegetarian',
@@ -173,7 +173,7 @@ export default function GuestsPage() {
           email: 'david.smith@email.com',
           phone: '(555) 987-6543',
           address: '456 Oak Ave, Los Angeles, CA',
-          rsvpStatus: 'pending',
+          rsvpStatus: 'Pending',
           plusOne: false,
           plusOneName: '',
           dietaryRestrictions: '',
@@ -187,7 +187,7 @@ export default function GuestsPage() {
           email: 'emily.davis@email.com',
           phone: '(555) 456-7890',
           address: '789 Pine Rd, Chicago, IL',
-          rsvpStatus: 'declined',
+          rsvpStatus: 'Not Attending',
           plusOne: false,
           plusOneName: '',
           dietaryRestrictions: '',
@@ -248,7 +248,7 @@ export default function GuestsPage() {
           email: '',
           phone: '',
           address: '',
-          rsvpStatus: 'pending',
+          rsvpStatus: 'Pending',
           plusOne: false,
           plusOneName: '',
           dietaryRestrictions: '',
@@ -382,10 +382,10 @@ export default function GuestsPage() {
 
   const getRsvpStats = () => {
     const total = guests.length
-    const attending = guests.filter(g => g.rsvpStatus === 'attending').length
-    const declined = guests.filter(g => g.rsvpStatus === 'declined').length
-    const pending = guests.filter(g => g.rsvpStatus === 'pending').length
-    const maybe = guests.filter(g => g.rsvpStatus === 'maybe').length
+    const attending = guests.filter(g => g.rsvpStatus === 'Attending').length
+    const declined = guests.filter(g => g.rsvpStatus === 'Not Attending').length
+    const pending = guests.filter(g => g.rsvpStatus === 'Pending').length
+    const maybe = guests.filter(g => g.rsvpStatus === 'Maybe').length
 
     return { total, attending, declined, pending, maybe }
   }
@@ -821,7 +821,7 @@ export default function GuestsPage() {
                         {importPreview.map((row, index) => (
                           <tr key={index}>
                             {Object.values(row).map((value, i) => (
-                              <td key={i} className="p-2 border-b">{String(value)}</td>
+                              <td key={`${index}-${i}`} className="p-2 border-b">{String(value)}</td>
                             ))}
                           </tr>
                         ))}

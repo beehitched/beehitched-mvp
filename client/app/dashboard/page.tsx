@@ -26,6 +26,8 @@ import {
   ChevronRight
 } from 'lucide-react'
 import Navigation from '@/components/Navigation'
+import Link from 'next/link'
+import MessagingSystem from '@/components/MessagingSystem'
 
 interface Task {
   _id: string
@@ -40,10 +42,14 @@ interface Guest {
   _id: string
   name: string
   email: string
-  rsvpStatus: 'pending' | 'attending' | 'declined'
-  isChild: boolean
-  dietaryRestrictions: string
+  phone: string
+  rsvpStatus: 'Pending' | 'Attending' | 'Not Attending' | 'Maybe'
   plusOne: boolean
+  plusOneName: string
+  dietaryRestrictions: string
+  notes: string
+  group: string
+  createdAt: string
 }
 
 interface Collaborator {
@@ -68,6 +74,8 @@ interface VendorStatus {
 export default function DashboardPage() {
   const { user, token } = useAuth()
   const [loading, setLoading] = useState(true)
+  const [hasWedding, setHasWedding] = useState(false)
+  const [wedding, setWedding] = useState<any>(null)
   const [tasks, setTasks] = useState<Task[]>([])
   const [guests, setGuests] = useState<Guest[]>([])
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
@@ -77,23 +85,60 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user && token) {
-      fetchDashboardData()
+      checkWeddingStatus()
     }
   }, [user, token])
 
+  useEffect(() => {
+    if (wedding?.id && hasWedding) {
+      fetchDashboardData()
+    }
+  }, [wedding, hasWedding])
+
+  const checkWeddingStatus = async () => {
+    try {
+      console.log('Checking wedding status for user:', user?.id)
+      const response = await fetch(`${API_URL}/collaboration/user/has-wedding`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      console.log('Wedding status response:', response.status)
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Wedding status data:', data)
+        console.log('Wedding object:', data.wedding)
+        if (data.hasWedding) {
+          setHasWedding(true)
+          setWedding(data.wedding)
+          setMyRole({
+            role: data.role,
+            permissions: data.permissions
+          })
+        } else {
+          setHasWedding(false)
+          setLoading(false)
+        }
+      } else {
+        setHasWedding(false)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error('Error checking wedding status:', error)
+      setHasWedding(false)
+      setLoading(false)
+    }
+  }
+
   const fetchDashboardData = async () => {
     try {
-      const [tasksRes, guestsRes, collaboratorsRes, roleRes] = await Promise.all([
+      const [tasksRes, guestsRes, collaboratorsRes] = await Promise.all([
         fetch(`${API_URL}/timeline`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
         fetch(`${API_URL}/guests`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API_URL}/collaboration/${user?._id || user?.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/collaboration/${user?._id || user?.id}/my-role`, {
+        fetch(`${API_URL}/collaboration/${wedding.id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ])
@@ -101,21 +146,22 @@ export default function DashboardPage() {
       if (tasksRes.ok) {
         const tasksData = await tasksRes.json()
         setTasks(tasksData)
+      } else {
+        console.error('Failed to fetch tasks:', tasksRes.status)
       }
 
       if (guestsRes.ok) {
         const guestsData = await guestsRes.json()
         setGuests(guestsData)
+      } else {
+        console.error('Failed to fetch guests:', guestsRes.status)
       }
 
       if (collaboratorsRes.ok) {
         const collaboratorsData = await collaboratorsRes.json()
         setCollaborators(collaboratorsData)
-      }
-
-      if (roleRes.ok) {
-        const roleData = await roleRes.json()
-        setMyRole(roleData)
+      } else {
+        console.error('Failed to fetch collaborators:', collaboratorsRes.status)
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -127,11 +173,10 @@ export default function DashboardPage() {
   // Calculate guest statistics
   const guestStats = {
     total: guests.length,
-    attending: guests.filter(g => g.rsvpStatus === 'attending').length,
-    pending: guests.filter(g => g.rsvpStatus === 'pending').length,
-    declined: guests.filter(g => g.rsvpStatus === 'declined').length,
-    adults: guests.filter(g => !g.isChild).length,
-    children: guests.filter(g => g.isChild).length,
+    attending: guests.filter(g => g.rsvpStatus === 'Attending').length,
+    pending: guests.filter(g => g.rsvpStatus === 'Pending').length,
+    declined: guests.filter(g => g.rsvpStatus === 'Not Attending').length,
+    maybe: guests.filter(g => g.rsvpStatus === 'Maybe').length,
     withDietaryRestrictions: guests.filter(g => g.dietaryRestrictions).length
   }
 
@@ -186,6 +231,62 @@ export default function DashboardPage() {
     )
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <Heart className="w-16 h-16 text-primary-600 mx-auto mb-4 animate-pulse" />
+            <p className="text-gray-600">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show setup flow for users without weddings
+  if (!hasWedding) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="card p-8"
+            >
+              <Heart className="w-16 h-16 text-primary-600 mx-auto mb-6" />
+              <h1 className="text-3xl font-serif font-bold text-gray-900 mb-4">
+                Welcome to BeeHitched, {user.name}!
+              </h1>
+              <p className="text-gray-600 mb-8">
+                Let's get your wedding planning started. You can either create a new wedding or join an existing one.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <Link 
+                  href="/create-wedding"
+                  className="bg-primary-600 text-white py-3 px-6 rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                >
+                  Create New Wedding
+                </Link>
+                <Link 
+                  href="/join-wedding"
+                  className="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  Join Existing Wedding
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -197,11 +298,18 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">
-            Welcome back, {user.name}!
-          </h1>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-3xl font-serif font-bold text-gray-900">
+              Welcome back, {user.name}!
+            </h1>
+            {myRole?.role && (
+              <div className="px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm font-medium">
+                {myRole.role}
+              </div>
+            )}
+          </div>
           <p className="text-gray-600">
-            Here's your wedding planning overview.
+            {wedding?.name ? `Planning: ${wedding.name}` : 'Here\'s your wedding planning overview.'}
           </p>
         </motion.div>
 
@@ -220,6 +328,35 @@ export default function DashboardPage() {
                 <Calendar className="w-6 h-6 text-primary-600" />
               </div>
               
+              {/* Settings Note */}
+              {(!wedding?.weddingDate || !wedding?.venue) && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start">
+                    <AlertCircle className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-900 mb-1">
+                        Complete Your Wedding Details
+                      </p>
+                      <p className="text-sm text-blue-700 mb-3">
+                        {!wedding?.weddingDate && !wedding?.venue 
+                          ? "Add your wedding date and venue to get the most out of your planning experience."
+                          : !wedding?.weddingDate 
+                          ? "Set your wedding date to enable timeline planning and deadline tracking."
+                          : "Add your venue details to help with guest coordination and vendor planning."
+                        }
+                      </p>
+                      <a 
+                        href="/settings" 
+                        className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        Go to Settings
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-center space-x-3 mb-4">
@@ -229,8 +366,8 @@ export default function DashboardPage() {
                     <div>
                       <p className="text-sm text-gray-600">Wedding Date</p>
                       <p className="font-semibold text-gray-900">
-                        {user.weddingDate ? 
-                          new Date(user.weddingDate).toLocaleDateString('en-US', { 
+                        {wedding?.weddingDate ? 
+                          new Date(wedding.weddingDate).toLocaleDateString('en-US', { 
                             weekday: 'long', 
                             year: 'numeric', 
                             month: 'long', 
@@ -248,7 +385,7 @@ export default function DashboardPage() {
                     <div>
                       <p className="text-sm text-gray-600">Time</p>
                       <p className="font-semibold text-gray-900">
-                        {user.weddingDate ? 'TBD' : 'Not set'}
+                        {wedding?.weddingDate ? 'TBD' : 'Not set'}
                       </p>
                     </div>
                   </div>
@@ -262,7 +399,7 @@ export default function DashboardPage() {
                     <div>
                       <p className="text-sm text-gray-600">Venue</p>
                       <p className="font-semibold text-gray-900">
-                        {user.venue || 'Not booked'}
+                        {wedding?.venue || 'Not booked'}
                       </p>
                     </div>
                   </div>
@@ -274,7 +411,7 @@ export default function DashboardPage() {
                     <div>
                       <p className="text-sm text-gray-600">Location</p>
                       <p className="font-semibold text-gray-900">
-                        {user.venue ? 'Address TBD' : 'Not set'}
+                        {wedding?.venue ? 'Address TBD' : 'Not set'}
                       </p>
                     </div>
                   </div>
@@ -329,15 +466,11 @@ export default function DashboardPage() {
                   <h4 className="font-medium text-gray-900 mb-3">Breakdown</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Adults</span>
-                      <span className="font-medium text-gray-900">{guestStats.adults}</span>
+                      <span className="text-sm text-gray-600">Total Guests</span>
+                      <span className="font-medium text-gray-900">{guestStats.total}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Children</span>
-                      <span className="font-medium text-gray-900">{guestStats.children}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Dietary Notes</span>
+                      <span className="text-sm text-gray-600">With Dietary Notes</span>
                       <span className="font-medium text-gray-900">{guestStats.withDietaryRestrictions}</span>
                     </div>
                   </div>
@@ -517,15 +650,15 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Budget Used</span>
                   <span className="font-medium text-gray-900">
-                    ${user.budget ? Math.round((user.budget * 0.34)) : 0} / ${user.budget || 0}
+                    ${wedding?.budget ? Math.round((wedding.budget * 0.34)) : 0} / ${wedding?.budget || 0}
                   </span>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Days Until Wedding</span>
                   <span className="font-medium text-gray-900">
-                    {user.weddingDate ? 
-                      Math.ceil((new Date(user.weddingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
+                    {wedding?.weddingDate ? 
+                      Math.ceil((new Date(wedding.weddingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
                       'Not set'
                     }
                   </span>
@@ -562,15 +695,18 @@ export default function DashboardPage() {
                   <UserPlus className="w-5 h-5" />
                   <span>Invite Collaborator</span>
                 </button>
-                <button className="w-full btn-secondary text-left flex items-center space-x-3">
-                  <Heart className="w-5 h-5" />
-                  <span>View Shop</span>
-                </button>
+                <Link href="/vendors" className="w-full btn-secondary text-left flex items-center space-x-3">
+                  <Building2 className="w-5 h-5" />
+                  <span>Find Vendors</span>
+                </Link>
               </div>
             </motion.div>
           </div>
         </div>
       </div>
+      
+      {/* Messaging System */}
+      <MessagingSystem collaborators={collaborators} />
     </div>
   )
 } 

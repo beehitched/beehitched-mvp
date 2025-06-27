@@ -3,187 +3,93 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const User = require('./models/User');
+const Wedding = require('./models/Wedding');
 const Task = require('./models/Task');
 const Guest = require('./models/Guest');
-const Product = require('./models/Product');
-const WeddingRole = require('./models/WeddingRole');
 const Collaborator = require('./models/Collaborator');
+const Message = require('./models/Message');
 
 // Sample user data
-const sampleUsers = [
+const sampleUser = {
+  name: 'Emily Chen',
+  email: 'emily@example.com',
+  password: 'password123',
+  isActive: true
+};
+
+// Sample wedding data
+const sampleWedding = {
+  name: 'Emily & David\'s Wedding',
+  weddingDate: new Date('2025-12-12T18:00:00.000Z'),
+  venue: 'The Grand Ballroom at Sunset Gardens',
+  theme: 'Romantic Garden Elegance',
+  budget: 35000,
+  guestCount: 180,
+  description: 'A beautiful celebration of love in a romantic garden setting'
+};
+
+// Sample collaborators data
+const sampleCollaborators = [
+  {
+    name: 'David Chen',
+    email: 'david@example.com',
+    role: 'Groom',
+    status: 'accepted'
+  },
   {
     name: 'Sarah Johnson',
     email: 'sarah@example.com',
-    password: 'password123',
-    partnerName: 'Michael Johnson',
-    weddingDate: new Date('2024-09-15'),
-    budget: 25000,
-    guestCount: 150,
-    venue: 'The Grand Ballroom',
-    theme: 'Rustic Elegance'
+    role: 'Maid of Honor',
+    status: 'accepted'
   },
   {
-    name: 'Emily Chen',
-    email: 'emily@example.com',
-    password: 'password123',
-    partnerName: 'David Chen',
-    weddingDate: new Date('2024-10-20'),
-    budget: 30000,
-    guestCount: 200,
-    venue: 'Sunset Gardens',
-    theme: 'Modern Minimalist'
+    name: 'Michael Chen',
+    email: 'michael@example.com',
+    role: 'Best Man',
+    status: 'accepted'
+  },
+  {
+    name: 'Lisa Chen',
+    email: 'lisa@example.com',
+    role: 'Parent',
+    status: 'accepted'
   }
 ];
 
-// Sample wedding roles
-const sampleWeddingRoles = [
-  {
-    name: 'Bride',
-    color: '#FF69B4',
-    permissions: {
-      canView: true,
-      canEditTimeline: true,
-      canEditGuests: true,
-      canEditShop: true,
-      canInviteOthers: true,
-      canManageRoles: true
-    }
-  },
-  {
-    name: 'Groom',
-    color: '#4169E1',
-    permissions: {
-      canView: true,
-      canEditTimeline: true,
-      canEditGuests: true,
-      canEditShop: true,
-      canInviteOthers: true,
-      canManageRoles: true
-    }
-  },
-  {
-    name: 'Planner',
-    color: '#32CD32',
-    permissions: {
-      canView: true,
-      canEditTimeline: true,
-      canEditGuests: true,
-      canEditShop: true,
-      canInviteOthers: true,
-      canManageRoles: false
-    }
-  },
-  {
-    name: 'Maid of Honor',
-    color: '#FFB6C1',
-    permissions: {
-      canView: true,
-      canEditTimeline: true,
-      canEditGuests: true,
-      canEditShop: false,
-      canInviteOthers: false,
-      canManageRoles: false
-    }
-  },
-  {
-    name: 'Best Man',
-    color: '#87CEEB',
-    permissions: {
-      canView: true,
-      canEditTimeline: true,
-      canEditGuests: true,
-      canEditShop: false,
-      canInviteOthers: false,
-      canManageRoles: false
-    }
-  },
-  {
-    name: 'Parent',
-    color: '#DDA0DD',
-    permissions: {
-      canView: true,
-      canEditTimeline: false,
-      canEditGuests: false,
-      canEditShop: false,
-      canInviteOthers: false,
-      canManageRoles: false
-    }
-  },
-  {
-    name: 'Friend',
-    color: '#F0E68C',
-    permissions: {
-      canView: true,
-      canEditTimeline: false,
-      canEditGuests: false,
-      canEditShop: false,
-      canInviteOthers: false,
-      canManageRoles: false
-    }
-  }
-];
-
-// Sample tasks data with role assignments
+// Sample tasks data
 const sampleTasks = [
-  // Venue tasks
   {
     title: 'Book ceremony venue',
     description: 'Research and book the perfect ceremony location',
     category: 'Venue',
     status: 'Done',
     priority: 'High',
-    dueDate: new Date('2024-03-15'),
-    budget: 5000,
-    assignedTo: 'Sarah',
+    dueDate: new Date('2025-03-15'),
+    budget: 8000,
+    assignedTo: 'Emily',
     assignedRoles: ['Bride', 'Planner'],
-    notes: 'Deposit paid, contract signed',
+    notes: 'Deposit paid, contract signed for The Grand Ballroom',
     completionDetails: {
       vendorName: 'The Grand Ballroom',
       vendorContact: '555-123-4567 | venue@grandballroom.com',
-      cost: '$4,800',
-      dateCompleted: new Date('2024-02-15'),
-      notes: 'Deposit of $1,200 paid. Contract signed for September 15th, 2024. Includes ceremony and reception space, catering, and basic decor.',
+      cost: '$7,800',
+      dateCompleted: new Date('2025-02-15'),
+      notes: 'Deposit of $2,000 paid. Contract signed for December 12th, 2025. Includes ceremony and reception space, catering, and basic decor.',
       attachments: []
     },
-    completedDate: new Date('2024-02-15')
+    completedDate: new Date('2025-02-15')
   },
-  {
-    title: 'Book reception venue',
-    description: 'Secure reception venue with catering options',
-    category: 'Venue',
-    status: 'In Progress',
-    priority: 'High',
-    dueDate: new Date('2024-04-01'),
-    budget: 8000,
-    assignedTo: 'Michael',
-    assignedRoles: ['Groom', 'Planner'],
-    notes: 'Touring 3 venues this week'
-  },
-  {
-    title: 'Visit venue for final walkthrough',
-    description: 'Final venue inspection and layout planning',
-    category: 'Venue',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: new Date('2024-08-15'),
-    budget: 0,
-    assignedTo: 'Both',
-    assignedRoles: ['Bride', 'Groom', 'Planner'],
-    notes: 'Schedule with venue coordinator'
-  },
-
-  // Food tasks
   {
     title: 'Choose catering menu',
     description: 'Select appetizers, main course, and dessert options',
     category: 'Food',
     status: 'In Progress',
     priority: 'High',
-    dueDate: new Date('2024-05-01'),
-    budget: 3000,
-    assignedTo: 'Sarah',
+    dueDate: new Date('2025-05-01'),
+    budget: 5000,
+    assignedTo: 'Emily',
     assignedRoles: ['Bride', 'Maid of Honor'],
-    notes: 'Tasting scheduled for next week'
+    notes: 'Tasting scheduled for next week with 3 caterers'
   },
   {
     title: 'Order wedding cake',
@@ -191,499 +97,303 @@ const sampleTasks = [
     category: 'Food',
     status: 'To Do',
     priority: 'Medium',
-    dueDate: new Date('2024-07-01'),
-    budget: 500,
-    assignedTo: 'Sarah',
-    assignedRoles: ['Bride'],
-    notes: 'Need to decide on flavor and design'
-  },
-  {
-    title: 'Arrange alcohol service',
-    description: 'Coordinate with venue for bar service',
-    category: 'Food',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: new Date('2024-06-15'),
-    budget: 1500,
-    assignedTo: 'Michael',
-    assignedRoles: ['Groom', 'Best Man'],
-    notes: 'Check venue\'s alcohol policy'
-  },
-
-  // Decor tasks
-  {
-    title: 'Choose floral arrangements',
-    description: 'Select bouquets, centerpieces, and ceremony flowers',
-    category: 'Decor',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: new Date('2024-06-01'),
-    budget: 2000,
-    assignedTo: 'Sarah',
-    assignedRoles: ['Bride', 'Maid of Honor'],
-    notes: 'Schedule consultation with florist'
-  },
-  {
-    title: 'Order table linens',
-    description: 'Select tablecloths, napkins, and chair covers',
-    category: 'Decor',
-    status: 'To Do',
-    priority: 'Low',
-    dueDate: new Date('2024-07-15'),
+    dueDate: new Date('2025-07-01'),
     budget: 800,
-    assignedTo: 'Sarah',
+    assignedTo: 'Emily',
     assignedRoles: ['Bride'],
-    notes: 'Need to match wedding colors'
+    notes: 'Need to decide on flavor and design - thinking vanilla with fresh berries'
   },
   {
-    title: 'Design ceremony backdrop',
-    description: 'Create beautiful ceremony arch or backdrop',
-    category: 'Decor',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: new Date('2024-08-01'),
-    budget: 600,
-    assignedTo: 'Michael',
+    title: 'Book photographer',
+    description: 'Hire professional wedding photographer',
+    category: 'Photography',
+    status: 'Done',
+    priority: 'High',
+    dueDate: new Date('2025-04-01'),
+    budget: 3000,
+    assignedTo: 'David',
     assignedRoles: ['Groom', 'Best Man'],
-    notes: 'Consider DIY option to save money'
+    notes: 'Booked with Sarah Photography - 8 hours coverage',
+    completionDetails: {
+      vendorName: 'Sarah Photography',
+      vendorContact: '555-987-6543 | sarah@photography.com',
+      cost: '$2,800',
+      dateCompleted: new Date('2025-03-20'),
+      notes: 'Deposit of $500 paid. Package includes engagement shoot, full day coverage, and 500 edited photos.',
+      attachments: []
+    },
+    completedDate: new Date('2025-03-20')
   },
-
-  // Attire tasks
   {
-    title: 'Buy wedding dress',
+    title: 'Choose wedding dress',
     description: 'Find and purchase the perfect wedding dress',
     category: 'Attire',
     status: 'Done',
     priority: 'High',
-    dueDate: new Date('2024-02-15'),
-    budget: 2000,
-    assignedTo: 'Sarah',
-    assignedRoles: ['Bride', 'Maid of Honor'],
-    notes: 'Dress purchased, alterations scheduled',
-    completionDetails: {
-      vendorName: 'Bridal Boutique Elegance',
-      vendorContact: '555-987-6543 | info@bridalelegance.com',
-      cost: '$1,850',
-      dateCompleted: new Date('2024-01-20'),
-      notes: 'Purchased A-line lace dress with cathedral train. Alterations scheduled for August. Includes veil and accessories.',
-      attachments: []
-    },
-    completedDate: new Date('2024-01-20')
-  },
-  {
-    title: 'Choose bridesmaid dresses',
-    description: 'Select and order bridesmaid dresses',
-    category: 'Attire',
-    status: 'In Progress',
-    priority: 'Medium',
-    dueDate: new Date('2024-04-15'),
-    budget: 1200,
-    assignedTo: 'Sarah',
-    assignedRoles: ['Bride', 'Maid of Honor'],
-    notes: 'Need to coordinate with bridesmaids'
-  },
-  {
-    title: 'Rent groom\'s tuxedo',
-    description: 'Select and rent groom\'s wedding attire',
-    category: 'Attire',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: new Date('2024-07-01'),
-    budget: 300,
-    assignedTo: 'Michael',
-    assignedRoles: ['Groom', 'Best Man'],
-    notes: 'Schedule fitting appointment'
-  },
-
-  // Photography tasks
-  {
-    title: 'Hire wedding photographer',
-    description: 'Research and book wedding photographer',
-    category: 'Photography',
-    status: 'Done',
-    priority: 'High',
-    dueDate: new Date('2024-03-01'),
+    dueDate: new Date('2025-06-01'),
     budget: 2500,
-    assignedTo: 'Both',
-    assignedRoles: ['Bride', 'Groom', 'Planner'],
-    notes: 'Photographer booked, engagement session scheduled',
+    assignedTo: 'Emily',
+    assignedRoles: ['Bride', 'Maid of Honor'],
+    notes: 'Found the perfect dress at Bridal Boutique!',
     completionDetails: {
-      vendorName: 'Sarah\'s Photography Studio',
-      vendorContact: '555-456-7890 | sarah@photostudio.com',
-      cost: '$2,400',
-      dateCompleted: new Date('2024-02-15'),
-      notes: 'Booked for 8 hours coverage. Includes engagement session, wedding day photography, and 200 edited photos. Contract signed with 50% deposit.',
+      vendorName: 'Bridal Boutique',
+      vendorContact: '555-456-7890 | info@bridalboutique.com',
+      cost: '$2,300',
+      dateCompleted: new Date('2025-05-15'),
+      notes: 'Dress purchased and alterations scheduled. Includes veil and accessories.',
       attachments: []
     },
-    completedDate: new Date('2024-02-15')
+    completedDate: new Date('2025-05-15')
   },
   {
-    title: 'Create shot list',
-    description: 'Compile list of must-have photos',
-    category: 'Photography',
-    status: 'To Do',
-    priority: 'Low',
-    dueDate: new Date('2024-08-01'),
-    budget: 0,
-    assignedTo: 'Sarah',
-    assignedRoles: ['Bride', 'Maid of Honor'],
-    notes: 'Include family photos and special moments'
-  },
-  {
-    title: 'Book videographer',
-    description: 'Hire professional wedding videographer',
-    category: 'Photography',
-    status: 'To Do',
-    priority: 'Medium',
-    dueDate: new Date('2024-05-15'),
-    budget: 1800,
-    assignedTo: 'Michael',
-    assignedRoles: ['Groom', 'Best Man'],
-    notes: 'Research local videographers'
-  },
-
-  // Music tasks
-  {
-    title: 'Hire DJ or band',
-    description: 'Book entertainment for reception',
+    title: 'Book DJ/Entertainment',
+    description: 'Hire DJ for reception entertainment',
     category: 'Music',
     status: 'In Progress',
     priority: 'Medium',
-    dueDate: new Date('2024-05-01'),
+    dueDate: new Date('2025-06-15'),
     budget: 1200,
-    assignedTo: 'Michael',
+    assignedTo: 'David',
     assignedRoles: ['Groom', 'Best Man'],
     notes: 'Interviewing 3 DJs this week'
   },
   {
-    title: 'Choose ceremony music',
-    description: 'Select processional, recessional, and ceremony songs',
-    category: 'Music',
+    title: 'Send out invitations',
+    description: 'Design and send wedding invitations',
+    category: 'Other',
     status: 'To Do',
-    priority: 'Low',
-    dueDate: new Date('2024-07-15'),
-    budget: 0,
-    assignedTo: 'Sarah',
+    priority: 'High',
+    dueDate: new Date('2025-08-01'),
+    budget: 800,
+    assignedTo: 'Emily',
     assignedRoles: ['Bride', 'Maid of Honor'],
-    notes: 'Coordinate with ceremony musicians'
+    notes: 'Need to finalize guest list first'
   },
   {
-    title: 'Create reception playlist',
-    description: 'Compile songs for cocktail hour and dancing',
-    category: 'Music',
-    status: 'To Do',
-    priority: 'Low',
-    dueDate: new Date('2024-08-01'),
-    budget: 0,
-    assignedTo: 'Both',
-    assignedRoles: ['Bride', 'Groom'],
-    notes: 'Include special songs for first dance'
-  },
-
-  // Transportation tasks
-  {
-    title: 'Book limo service',
-    description: 'Arrange transportation for wedding party',
-    category: 'Transportation',
+    title: 'Plan honeymoon',
+    description: 'Book honeymoon destination and travel',
+    category: 'Other',
     status: 'To Do',
     priority: 'Medium',
-    dueDate: new Date('2024-06-15'),
-    budget: 800,
-    assignedTo: 'Michael',
-    assignedRoles: ['Groom', 'Best Man'],
-    notes: 'Need transportation for 8 people'
+    dueDate: new Date('2025-09-01'),
+    budget: 5000,
+    assignedTo: 'Both',
+    assignedRoles: ['Bride', 'Groom'],
+    notes: 'Thinking about Hawaii or Europe'
   },
   {
-    title: 'Arrange guest shuttle',
-    description: 'Coordinate shuttle service for guests',
-    category: 'Transportation',
-    status: 'To Do',
-    priority: 'Low',
-    dueDate: new Date('2024-07-01'),
-    budget: 500,
-    assignedTo: 'Michael',
-    assignedRoles: ['Groom'],
-    notes: 'From hotel to venue and back'
+    title: 'Finalize guest list',
+    description: 'Complete guest list and get addresses',
+    category: 'Other',
+    status: 'In Progress',
+    priority: 'High',
+    dueDate: new Date('2025-07-15'),
+    budget: 0,
+    assignedTo: 'Both',
+    assignedRoles: ['Bride', 'Groom', 'Parent'],
+    notes: 'Currently at 180 guests, need to finalize by next week'
   },
   {
-    title: 'Book airport transfers',
-    description: 'Arrange transportation for out-of-town guests',
-    category: 'Transportation',
-    status: 'To Do',
-    priority: 'Low',
-    dueDate: new Date('2024-08-01'),
-    budget: 300,
-    assignedTo: 'Sarah',
+    title: 'Book florist',
+    description: 'Choose and book wedding florist',
+    category: 'Decor',
+    status: 'Done',
+    priority: 'Medium',
+    dueDate: new Date('2025-05-15'),
+    budget: 2000,
+    assignedTo: 'Emily',
     assignedRoles: ['Bride'],
-    notes: 'For immediate family only'
+    notes: 'Booked with Garden Blooms - romantic garden theme',
+    completionDetails: {
+      vendorName: 'Garden Blooms',
+      vendorContact: '555-321-6547 | info@gardenblooms.com',
+      cost: '$1,800',
+      dateCompleted: new Date('2025-04-30'),
+      notes: 'Deposit of $400 paid. Includes bridal bouquet, bridesmaid bouquets, boutonnieres, and ceremony/reception decor.',
+      attachments: []
+    },
+    completedDate: new Date('2025-04-30')
   }
 ];
 
-// Sample guests data with role assignments
+// Sample guests data
 const sampleGuests = [
   {
-    name: 'Jennifer Smith',
-    email: 'jennifer.smith@email.com',
-    phone: '(555) 123-4567',
+    name: 'John Smith',
+    email: 'john.smith@email.com',
+    phone: '555-123-4567',
+    address: '123 Main St, Anytown, CA 90210',
     rsvpStatus: 'Attending',
+    plusOne: false,
+    dietaryRestrictions: 'None',
+    assignedRoles: ['Friend'],
+    notes: 'College friend of David',
+    tableNumber: 5,
+    giftReceived: false,
+    thankYouSent: false
+  },
+  {
+    name: 'Mary Johnson',
+    email: 'mary.johnson@email.com',
+    phone: '555-234-5678',
+    address: '456 Oak Ave, Somewhere, CA 90211',
+    rsvpStatus: 'Attending',
+    plusOne: true,
+    plusOneName: 'Tom Johnson',
     dietaryRestrictions: 'Vegetarian',
-    group: 'Bride\'s Family',
-    tableNumber: 1,
-    isVip: true,
-    assignedRoles: ['Parent'],
-    notes: 'Aunt - mother\'s sister'
-  },
-  {
-    name: 'Robert Johnson',
-    email: 'robert.johnson@email.com',
-    phone: '(555) 234-5678',
-    rsvpStatus: 'Attending',
-    dietaryRestrictions: '',
-    group: 'Groom\'s Family',
-    tableNumber: 2,
-    isVip: true,
-    assignedRoles: ['Parent'],
-    notes: 'Father of the groom'
-  },
-  {
-    name: 'Maria Garcia',
-    email: 'maria.garcia@email.com',
-    phone: '(555) 345-6789',
-    rsvpStatus: 'Attending',
-    dietaryRestrictions: 'Gluten-free',
-    group: 'Bride\'s Friends',
+    assignedRoles: ['Friend'],
+    notes: 'Work colleague of Emily',
     tableNumber: 3,
-    isVip: false,
-    assignedRoles: ['Maid of Honor'],
-    notes: 'College roommate'
+    giftReceived: true,
+    thankYouSent: false
   },
   {
-    name: 'David Wilson',
-    email: 'david.wilson@email.com',
-    phone: '(555) 456-7890',
-    rsvpStatus: 'Not Attending',
-    dietaryRestrictions: '',
-    group: 'Groom\'s Friends',
-    tableNumber: null,
-    isVip: false,
-    assignedRoles: ['Best Man'],
-    notes: 'Out of town - sends regrets'
-  },
-  {
-    name: 'Lisa Brown',
-    email: 'lisa.brown@email.com',
-    phone: '(555) 567-8901',
+    name: 'Robert Chen',
+    email: 'robert.chen@email.com',
+    phone: '555-345-6789',
+    address: '789 Pine St, Elsewhere, CA 90212',
     rsvpStatus: 'Pending',
-    dietaryRestrictions: '',
-    group: 'Bride\'s Family',
-    tableNumber: null,
-    isVip: false,
-    assignedRoles: ['Sibling'],
-    notes: 'Cousin - needs to check work schedule'
+    plusOne: false,
+    dietaryRestrictions: 'None',
+    assignedRoles: ['Other'],
+    notes: 'David\'s uncle',
+    tableNumber: 1,
+    giftReceived: false,
+    thankYouSent: false
   },
   {
-    name: 'James Davis',
-    email: 'james.davis@email.com',
-    phone: '(555) 678-9012',
+    name: 'Jennifer Lee',
+    email: 'jennifer.lee@email.com',
+    phone: '555-456-7890',
+    address: '321 Elm St, Nowhere, CA 90213',
     rsvpStatus: 'Attending',
-    dietaryRestrictions: '',
-    group: 'Groom\'s Friends',
+    plusOne: false,
+    dietaryRestrictions: 'Gluten-free',
+    assignedRoles: ['Friend'],
+    notes: 'Emily\'s childhood friend',
     tableNumber: 4,
-    isVip: false,
-    assignedRoles: ['Best Man'],
-    notes: 'Best man'
+    giftReceived: false,
+    thankYouSent: false
   },
   {
-    name: 'Amanda Miller',
-    email: 'amanda.miller@email.com',
-    phone: '(555) 789-0123',
+    name: 'William Brown',
+    email: 'william.brown@email.com',
+    phone: '555-567-8901',
+    address: '654 Maple Dr, Anywhere, CA 90214',
+    rsvpStatus: 'Not Attending',
+    plusOne: false,
+    dietaryRestrictions: 'None',
+    assignedRoles: ['Friend'],
+    notes: 'David\'s college roommate - can\'t make it due to work',
+    tableNumber: null,
+    giftReceived: false,
+    thankYouSent: false
+  },
+  {
+    name: 'Patricia Davis',
+    email: 'patricia.davis@email.com',
+    phone: '555-678-9012',
+    address: '987 Cedar Ln, Someplace, CA 90215',
     rsvpStatus: 'Attending',
+    plusOne: true,
+    plusOneName: 'James Davis',
+    dietaryRestrictions: 'None',
+    assignedRoles: ['Other'],
+    notes: 'Emily\'s aunt',
+    tableNumber: 2,
+    giftReceived: true,
+    thankYouSent: true
+  },
+  {
+    name: 'Michael Wilson',
+    email: 'michael.wilson@email.com',
+    phone: '555-789-0123',
+    address: '147 Birch Rd, Otherplace, CA 90216',
+    rsvpStatus: 'Pending',
+    plusOne: false,
     dietaryRestrictions: 'Vegan',
-    group: 'Bride\'s Friends',
-    tableNumber: 3,
-    isVip: false,
-    assignedRoles: ['Maid of Honor'],
-    notes: 'Maid of honor'
+    assignedRoles: ['Friend'],
+    notes: 'David\'s coworker',
+    tableNumber: 6,
+    giftReceived: false,
+    thankYouSent: false
+  },
+  {
+    name: 'Linda Anderson',
+    email: 'linda.anderson@email.com',
+    phone: '555-890-1234',
+    address: '258 Spruce Way, Newplace, CA 90217',
+    rsvpStatus: 'Attending',
+    plusOne: false,
+    dietaryRestrictions: 'None',
+    assignedRoles: ['Other'],
+    notes: 'Emily\'s cousin',
+    tableNumber: 2,
+    giftReceived: false,
+    thankYouSent: false
   },
   {
     name: 'Christopher Taylor',
     email: 'christopher.taylor@email.com',
-    phone: '(555) 890-1234',
-    rsvpStatus: 'Maybe',
-    dietaryRestrictions: '',
-    group: 'Groom\'s Family',
-    tableNumber: null,
-    isVip: false,
-    assignedRoles: ['Parent'],
-    notes: 'Uncle - checking with wife'
-  },
-  {
-    name: 'Jessica Anderson',
-    email: 'jessica.anderson@email.com',
-    phone: '(555) 901-2345',
+    phone: '555-901-2345',
+    address: '369 Willow Ct, Oldplace, CA 90218',
     rsvpStatus: 'Attending',
-    dietaryRestrictions: '',
-    group: 'Bride\'s Family',
-    tableNumber: 1,
-    isVip: false,
-    assignedRoles: ['Sibling'],
-    notes: 'Sister of the bride'
-  },
-  {
-    name: 'Michael Thomas',
-    email: 'michael.thomas@email.com',
-    phone: '(555) 012-3456',
-    rsvpStatus: 'Attending',
-    dietaryRestrictions: 'Nut allergy',
-    group: 'Groom\'s Friends',
-    tableNumber: 4,
-    isVip: false,
+    plusOne: true,
+    plusOneName: 'Amanda Taylor',
+    dietaryRestrictions: 'None',
     assignedRoles: ['Friend'],
-    notes: 'College friend'
+    notes: 'David\'s best friend from high school',
+    tableNumber: 1,
+    giftReceived: false,
+    thankYouSent: false
+  },
+  {
+    name: 'Susan Martinez',
+    email: 'susan.martinez@email.com',
+    phone: '555-012-3456',
+    address: '741 Aspen Blvd, Lastplace, CA 90219',
+    rsvpStatus: 'Attending',
+    plusOne: false,
+    dietaryRestrictions: 'Dairy-free',
+    assignedRoles: ['Other'],
+    notes: 'David\'s sister',
+    tableNumber: 1,
+    giftReceived: true,
+    thankYouSent: false
   }
 ];
 
-// Sample products data
-const sampleProducts = [
+// Sample messages data
+const sampleMessages = [
   {
-    name: 'Elegant Wedding Invitations',
-    description: 'Beautiful floral design wedding invitations with matching RSVP cards',
-    category: 'Invitations',
-    price: 89.99,
-    originalPrice: 119.99,
-    image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-    stockQuantity: 50,
-    tags: ['invitations', 'floral', 'elegant', 'wedding'],
-    vendor: 'Paper Dreams',
-    isFeatured: true,
-    rating: 4.8,
-    reviewCount: 127
+    senderName: 'Emily Chen',
+    content: 'Hey everyone! I just confirmed the bridesmaid dress fittings for next week.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
   },
   {
-    name: 'Rose Gold Table Numbers',
-    description: 'Elegant rose gold table numbers for wedding reception',
-    category: 'Signage',
-    price: 24.99,
-    originalPrice: 34.99,
-    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop',
-    stockQuantity: 25,
-    tags: ['table numbers', 'rose gold', 'elegant', 'reception'],
-    vendor: 'Wedding Elegance',
-    isFeatured: true,
-    rating: 4.6,
-    reviewCount: 89
+    senderName: 'Sarah Johnson',
+    content: 'Perfect! I\'ll make sure everyone knows the schedule. What time should we meet?',
+    timestamp: new Date(Date.now() - 1000 * 60 * 25) // 25 minutes ago
   },
   {
-    name: 'Crystal Champagne Flutes',
-    description: 'Set of 6 crystal champagne flutes for wedding toast',
-    category: 'Tableware',
-    price: 45.99,
-    originalPrice: 65.99,
-    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=400&fit=crop',
-    stockQuantity: 30,
-    tags: ['champagne', 'crystal', 'toast', 'elegant'],
-    vendor: 'Crystal Dreams',
-    isFeatured: false,
-    rating: 4.9,
-    reviewCount: 203
+    senderName: 'David Chen',
+    content: 'Thanks Sarah! That\'s a huge help. Emily, did you decide on the color scheme for the groomsmen?',
+    timestamp: new Date(Date.now() - 1000 * 60 * 20) // 20 minutes ago
   },
   {
-    name: 'Floating Candle Centerpieces',
-    description: 'Set of 3 floating candle centerpieces with rose petals',
-    category: 'Decor',
-    price: 32.99,
-    originalPrice: 42.99,
-    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop',
-    stockQuantity: 40,
-    tags: ['centerpieces', 'candles', 'romantic', 'floating'],
-    vendor: 'Romantic Decor',
-    isFeatured: true,
-    rating: 4.7,
-    reviewCount: 156
+    senderName: 'Michael Chen',
+    content: 'I\'m thinking navy blue would look great with the garden theme. What do you think?',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15) // 15 minutes ago
   },
   {
-    name: 'Personalized Wedding Favors',
-    description: 'Custom monogrammed wedding favors for guests',
-    category: 'Party Favors',
-    price: 3.99,
-    originalPrice: 5.99,
-    image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-    stockQuantity: 200,
-    tags: ['favors', 'personalized', 'monogram', 'guests'],
-    vendor: 'Personal Touch',
-    isFeatured: false,
-    rating: 4.5,
-    reviewCount: 78
+    senderName: 'Emily Chen',
+    content: 'Navy blue sounds perfect! It will complement the bridesmaid dresses beautifully.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 10) // 10 minutes ago
   },
   {
-    name: 'Wedding Welcome Sign',
-    description: 'Beautiful wooden welcome sign for wedding ceremony',
-    category: 'Signage',
-    price: 89.99,
-    originalPrice: 119.99,
-    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop',
-    stockQuantity: 15,
-    tags: ['welcome sign', 'wooden', 'ceremony', 'rustic'],
-    vendor: 'Rustic Charm',
-    isFeatured: true,
-    rating: 4.8,
-    reviewCount: 94
-  },
-  {
-    name: 'Lace Table Runners',
-    description: 'Elegant lace table runners for reception tables',
-    category: 'Decor',
-    price: 18.99,
-    originalPrice: 28.99,
-    image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-    stockQuantity: 60,
-    tags: ['table runners', 'lace', 'elegant', 'reception'],
-    vendor: 'Elegant Linens',
-    isFeatured: false,
-    rating: 4.4,
-    reviewCount: 67
-  },
-  {
-    name: 'Wedding Guest Book',
-    description: 'Beautiful guest book with pen for wedding memories',
-    category: 'Other',
-    price: 24.99,
-    originalPrice: 34.99,
-    image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-    stockQuantity: 35,
-    tags: ['guest book', 'memories', 'wedding', 'keepsake'],
-    vendor: 'Memory Lane',
-    isFeatured: false,
-    rating: 4.6,
-    reviewCount: 112
-  },
-  {
-    name: 'Bridal Robe Set',
-    description: 'Silk bridal robe and slippers for getting ready',
-    category: 'Attire',
-    price: 65.99,
-    originalPrice: 85.99,
-    image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-    stockQuantity: 20,
-    tags: ['bridal robe', 'silk', 'getting ready', 'bridal party'],
-    vendor: 'Bridal Bliss',
-    isFeatured: true,
-    rating: 4.9,
-    reviewCount: 189
-  },
-  {
-    name: 'Wedding Photo Booth Props',
-    description: 'Fun photo booth props and backdrop for reception',
-    category: 'Party Favors',
-    price: 39.99,
-    originalPrice: 49.99,
-    image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-    stockQuantity: 25,
-    tags: ['photo booth', 'props', 'fun', 'entertainment'],
-    vendor: 'Party Time',
-    isFeatured: false,
-    rating: 4.3,
-    reviewCount: 45
+    senderName: 'Lisa Chen',
+    content: 'Don\'t forget about the rehearsal dinner planning! We need to finalize the menu.',
+    timestamp: new Date(Date.now() - 1000 * 60 * 5) // 5 minutes ago
   }
 ];
 
@@ -702,115 +412,136 @@ async function seedDatabase() {
 
     // Clear existing data
     await User.deleteMany({});
+    await Wedding.deleteMany({});
     await Task.deleteMany({});
     await Guest.deleteMany({});
-    await Product.deleteMany({});
-    await WeddingRole.deleteMany({});
     await Collaborator.deleteMany({});
+    await Message.deleteMany({});
 
     console.log('Cleared existing data');
 
-    // Create users
-    const createdUsers = [];
-    for (const userData of sampleUsers) {
-      const user = new User(userData);
-      await user.save();
-      createdUsers.push(user);
-      console.log(`Created user: ${user.name}`);
-    }
+    // Create main user
+    const user = new User(sampleUser);
+    await user.save();
+    console.log(`Created user: ${user.name}`);
 
-    // Create wedding roles for each user's wedding
-    const createdRoles = [];
-    for (const user of createdUsers) {
-      for (const roleData of sampleWeddingRoles) {
-        const role = new WeddingRole({
-          ...roleData,
-          weddingId: user._id // Each user's wedding gets its own set of roles
-        });
-        await role.save();
-        createdRoles.push(role);
-        console.log(`Created wedding role: ${role.name} for ${user.name}`);
+    // Create wedding
+    const wedding = new Wedding({
+      ...sampleWedding,
+      createdBy: user._id
+    });
+    await wedding.save();
+    console.log(`Created wedding: ${wedding.name}`);
+
+    // Create main user as wedding owner
+    const ownerCollaborator = new Collaborator({
+      weddingId: wedding._id,
+      userId: user._id,
+      role: 'Owner',
+      email: user.email,
+      name: user.name,
+      status: 'accepted',
+      invitedBy: user._id,
+      invitedAt: new Date(),
+      acceptedAt: new Date(),
+      permissions: {
+        canView: true,
+        canEditTimeline: true,
+        canEditGuests: true,
+        canEditShop: true,
+        canInviteOthers: true,
+        canManageRoles: true
       }
-    }
+    });
+    await ownerCollaborator.save();
+    console.log(`Created owner collaborator for ${user.name}`);
 
-    // Create collaborators for each user (they are their own collaborators with Bride role)
-    for (const user of createdUsers) {
+    // Create additional collaborators
+    for (const collaboratorData of sampleCollaborators) {
+      // Create a user account for each collaborator
+      const collaboratorUser = new User({
+        name: collaboratorData.name,
+        email: collaboratorData.email,
+        password: 'password123',
+        isActive: true
+      });
+      await collaboratorUser.save();
+      console.log(`Created user for collaborator: ${collaboratorData.name}`);
+
       const collaborator = new Collaborator({
-        userId: user._id,
-        weddingId: user._id, // Using user ID as wedding ID for simplicity
-        role: 'Bride', // Using string enum value
-        name: user.name,
-        email: user.email,
-        status: 'accepted',
+        weddingId: wedding._id,
+        userId: collaboratorUser._id, // Use the new user's ID
+        role: collaboratorData.role,
+        email: collaboratorData.email,
+        name: collaboratorData.name,
+        status: collaboratorData.status,
         invitedBy: user._id,
         invitedAt: new Date(),
         acceptedAt: new Date(),
         permissions: {
           canView: true,
-          canEditTimeline: true,
-          canEditGuests: true,
-          canEditShop: true,
-          canInviteOthers: true,
-          canManageRoles: true
+          canEditTimeline: collaboratorData.role === 'Maid of Honor' || collaboratorData.role === 'Best Man',
+          canEditGuests: collaboratorData.role === 'Maid of Honor' || collaboratorData.role === 'Best Man',
+          canEditShop: false,
+          canInviteOthers: false,
+          canManageRoles: false
         }
       });
       await collaborator.save();
-      console.log(`Created owner collaborator for ${user.name}`);
+      console.log(`Created collaborator: ${collaboratorData.name} (${collaboratorData.role})`);
     }
 
-    // Create tasks for each user with role assignments
-    for (const user of createdUsers) {
-      for (let i = 0; i < sampleTasks.length; i++) {
-        const taskData = { 
-          ...sampleTasks[i], 
-          user: user._id,
-          createdBy: user._id,
-          assignedRoles: sampleTasks[i].assignedRoles // Keep as string array, don't convert to ObjectIds
-        };
-        const task = new Task(taskData);
-        await task.save();
-      }
-      console.log(`Created ${sampleTasks.length} tasks for ${user.name}`);
+    // Create tasks
+    for (const taskData of sampleTasks) {
+      const task = new Task({
+        ...taskData,
+        user: user._id,
+        createdBy: user._id,
+        weddingId: wedding._id
+      });
+      await task.save();
     }
+    console.log(`Created ${sampleTasks.length} tasks`);
 
-    // Create guests for each user with role assignments
-    for (const user of createdUsers) {
-      for (let i = 0; i < sampleGuests.length; i++) {
-        const guestData = { 
-          ...sampleGuests[i], 
-          user: user._id,
-          createdBy: user._id,
-          assignedRoles: sampleGuests[i].assignedRoles // Keep as string array, don't convert to ObjectIds
-        };
-        const guest = new Guest(guestData);
-        await guest.save();
-      }
-      console.log(`Created ${sampleGuests.length} guests for ${user.name}`);
+    // Create guests
+    for (const guestData of sampleGuests) {
+      const guest = new Guest({
+        ...guestData,
+        user: user._id,
+        createdBy: user._id,
+        weddingId: wedding._id
+      });
+      await guest.save();
     }
+    console.log(`Created ${sampleGuests.length} guests`);
 
-    // Create products - handle potential index issues
-    try {
-      for (const productData of sampleProducts) {
-        const product = new Product(productData);
-        await product.save();
-      }
-      console.log(`Created ${sampleProducts.length} products`);
-    } catch (productError) {
-      console.log('Note: Some products may not have been created due to database constraints');
-      console.log('This is normal if there are existing indexes. Products can be added manually.');
+    // Create messages
+    for (const messageData of sampleMessages) {
+      const message = new Message({
+        weddingId: wedding._id,
+        senderId: user._id,
+        senderName: messageData.senderName,
+        content: messageData.content,
+        timestamp: messageData.timestamp
+      });
+      await message.save();
     }
+    console.log(`Created ${sampleMessages.length} messages`);
 
-    console.log('Database seeding completed successfully!');
-    console.log(`Created ${createdRoles.length} wedding roles`);
-    console.log(`Created ${createdUsers.length} users`);
-    console.log(`Created ${createdUsers.length} collaborators`);
-    console.log(`Created ${createdUsers.length * sampleTasks.length} tasks`);
-    console.log(`Created ${createdUsers.length * sampleGuests.length} guests`);
-    console.log(`Attempted to create ${sampleProducts.length} products`);
+    console.log('\nDatabase seeding completed successfully!');
+    console.log(`Created 5 users: ${user.name} + 4 collaborators`);
+    console.log(`Created 1 wedding: ${wedding.name}`);
+    console.log(`Created ${sampleCollaborators.length + 1} collaborators (including owner)`);
+    console.log(`Created ${sampleTasks.length} tasks`);
+    console.log(`Created ${sampleGuests.length} guests`);
+    console.log(`Created ${sampleMessages.length} messages`);
 
     console.log('\nTest Accounts:');
-    console.log('Sarah: sarah@example.com / password123');
-    console.log('Emily: emily@example.com / password123');
+    console.log('Main User: emily@example.com / password123');
+    console.log('Collaborators:');
+    sampleCollaborators.forEach(collab => {
+      console.log(`- ${collab.name}: ${collab.email} / password123 (${collab.role})`);
+    });
 
     process.exit(0);
   } catch (error) {

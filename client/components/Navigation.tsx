@@ -8,7 +8,7 @@ import {
   Home, 
   Calendar, 
   Users, 
-  ShoppingBag, 
+  Building2,
   Settings, 
   LogOut,
   Menu,
@@ -25,37 +25,12 @@ interface NavigationProps {
 export default function Navigation({ className = '' }: NavigationProps) {
   const { user, logout, token } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-  const [myRole, setMyRole] = useState<{ role: string } | null>(null)
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-
-  useEffect(() => {
-    if (user && token) {
-      fetchMyRole()
-    }
-  }, [user, token])
-
-  const fetchMyRole = async () => {
-    try {
-      const response = await fetch(`${API_URL}/collaboration/${user?._id || user?.id}/my-role`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setMyRole(data)
-      }
-    } catch (error) {
-      console.error('Error fetching role:', error)
-    }
-  }
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/timeline', label: 'Timeline', icon: Calendar },
     { href: '/guests', label: 'Guests', icon: Users },
-    { href: '/shop', label: 'Shop', icon: ShoppingBag },
+    { href: '/vendors', label: 'Vendors', icon: Building2 },
     { href: '/settings', label: 'Settings', icon: Settings }
   ]
 
@@ -87,9 +62,6 @@ export default function Navigation({ className = '' }: NavigationProps) {
 
           {/* User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            {myRole && (
-              <RoleBadge role={myRole.role} size="sm" />
-            )}
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-primary-600" />
@@ -135,11 +107,6 @@ export default function Navigation({ className = '' }: NavigationProps) {
               ))}
               
               <div className="border-t pt-4 px-4">
-                {myRole && (
-                  <div className="flex items-center space-x-2 mb-3">
-                    <RoleBadge role={myRole.role} size="sm" />
-                  </div>
-                )}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">

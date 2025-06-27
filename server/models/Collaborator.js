@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const collaboratorSchema = new mongoose.Schema({
   weddingId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Wedding',
     required: true
   },
   userId: {

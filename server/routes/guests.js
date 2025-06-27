@@ -95,7 +95,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
   }
 });
 
-// Create new guest
+// Create guest
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const {
@@ -111,18 +111,23 @@ router.post('/', authenticateToken, async (req, res) => {
       notes
     } = req.body;
 
+    // Validate rsvpStatus enum value
+    const validRsvpStatuses = ['Pending', 'Attending', 'Not Attending', 'Maybe'];
+    const finalRsvpStatus = rsvpStatus && validRsvpStatuses.includes(rsvpStatus) ? rsvpStatus : 'Pending';
+
     const guest = new Guest({
       user: req.user._id,
       name,
       email,
       phone,
-      rsvpStatus,
+      rsvpStatus: finalRsvpStatus,
       dietaryRestrictions,
       group,
       plusOne,
       tableNumber,
       isVip,
-      notes
+      notes,
+      createdBy: req.user._id
     });
 
     await guest.save();
@@ -234,13 +239,20 @@ router.post('/import', authenticateToken, upload.single('csvFile'), async (req, 
           rsvpStatus: row.rsvpStatus || 'Pending',
           dietaryRestrictions: row.dietaryRestrictions ? row.dietaryRestrictions.trim() : '',
           group: row.group ? row.group.trim() : '',
-          notes: row.notes ? row.notes.trim() : ''
+          notes: row.notes ? row.notes.trim() : '',
+          createdBy: req.user._id
         };
 
         // Validate email format
         if (guest.email && !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(guest.email)) {
           errors.push(`Invalid email for ${guest.name}: ${guest.email}`);
           return;
+        }
+
+        // Validate rsvpStatus enum value
+        const validRsvpStatuses = ['Pending', 'Attending', 'Not Attending', 'Maybe'];
+        if (guest.rsvpStatus && !validRsvpStatuses.includes(guest.rsvpStatus)) {
+          guest.rsvpStatus = 'Pending';
         }
 
         guests.push(guest);
@@ -354,6 +366,10 @@ router.post('/rsvp/:weddingId', async (req, res) => {
       return res.status(400).json({ error: 'Name and RSVP status are required' });
     }
 
+    // Validate rsvpStatus enum value
+    const validRsvpStatuses = ['Pending', 'Attending', 'Not Attending', 'Maybe'];
+    const finalRsvpStatus = validRsvpStatuses.includes(rsvpStatus) ? rsvpStatus : 'Pending';
+
     // Find the user by wedding ID
     const user = await User.findById(weddingId);
     if (!user) {
@@ -373,7 +389,7 @@ router.post('/rsvp/:weddingId', async (req, res) => {
       // Update existing guest
       existingGuest.name = name;
       existingGuest.phone = phone || existingGuest.phone;
-      existingGuest.rsvpStatus = rsvpStatus;
+      existingGuest.rsvpStatus = finalRsvpStatus;
       existingGuest.plusOne = plusOne;
       existingGuest.plusOneName = plusOneName;
       existingGuest.dietaryRestrictions = dietaryRestrictions;
@@ -393,13 +409,14 @@ router.post('/rsvp/:weddingId', async (req, res) => {
         name,
         email: email ? email.toLowerCase() : '',
         phone: phone || '',
-        rsvpStatus,
+        rsvpStatus: finalRsvpStatus,
         plusOne,
         plusOneName,
         dietaryRestrictions,
         group,
         notes,
-        rsvpDate: new Date()
+        rsvpDate: new Date(),
+        createdBy: weddingId // For public RSVP, use wedding ID as createdBy
       });
 
       await guest.save();
@@ -417,4 +434,4 @@ router.post('/rsvp/:weddingId', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

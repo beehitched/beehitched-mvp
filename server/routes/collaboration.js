@@ -5,39 +5,71 @@ const User = require('../models/User');
 const { authenticateToken } = require('../utils/auth');
 const router = express.Router();
 
+// Check if user has a wedding
+router.get('/user/has-wedding', authenticateToken, async (req, res) => {
+  try {
+    const collaborator = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (collaborator && collaborator.weddingId) {
+      res.json({
+        hasWedding: true,
+        wedding: {
+          id: collaborator.weddingId._id,
+          name: collaborator.weddingId.name,
+          weddingDate: collaborator.weddingId.weddingDate,
+          venue: collaborator.weddingId.venue,
+          theme: collaborator.weddingId.theme
+        },
+        role: collaborator.role,
+        permissions: collaborator.permissions
+      });
+    } else {
+      res.json({ hasWedding: false });
+    }
+  } catch (error) {
+    console.error('Check wedding status error:', error);
+    res.status(500).json({ error: 'Failed to check wedding status' });
+  }
+});
+
 // Get all collaborators for a wedding
 router.get('/:weddingId', authenticateToken, async (req, res) => {
   try {
     const { weddingId } = req.params;
     
-    // For MVP, treat user ID as wedding ID
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
+    const actualWeddingId = userWedding.weddingId._id;
+    
+    // Check if the requested wedding ID matches the user's actual wedding
+    if (actualWeddingId.toString() !== weddingId) {
+      return res.status(403).json({ error: 'Access denied to this wedding' });
+    }
+    
     // Check if user has access to this wedding
     const collaborator = await Collaborator.findOne({ 
-      weddingId, 
+      weddingId: actualWeddingId, 
       userId: req.user._id 
     });
     
-    // If no collaborator record exists, create one for the user as owner
+    // If no collaborator record exists, use the user's existing collaboration
     if (!collaborator) {
-      const newCollaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
-        userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
-        }
-      });
-      await newCollaborator.save();
+      // This shouldn't happen since we already found userWedding above
+      return res.status(404).json({ error: 'No collaboration found for user' });
     }
 
-    const collaborators = await Collaborator.find({ weddingId })
+    const collaborators = await Collaborator.find({ weddingId: actualWeddingId })
       .populate('userId', 'name email')
       .populate('invitedBy', 'name')
       .sort({ createdAt: -1 });
@@ -54,29 +86,32 @@ router.get('/:weddingId/my-role', authenticateToken, async (req, res) => {
   try {
     const { weddingId } = req.params;
     
+    // First, check if user has any collaboration for this specific wedding
     let collaborator = await Collaborator.findOne({ 
       weddingId, 
       userId: req.user._id 
     });
 
-    // If no collaborator record exists, create one for the user as owner
+    // If no collaborator record exists for this wedding, check if user has any wedding
     if (!collaborator) {
-      collaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
+      // Find the user's wedding through collaboration
+      const userWedding = await Collaborator.findOne({ 
         userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
+        status: 'accepted'
+      }).populate('weddingId');
+
+      if (userWedding && userWedding.weddingId) {
+        // Check if the requested wedding ID matches the user's actual wedding
+        if (userWedding.weddingId._id.toString() === weddingId) {
+          // Use the existing collaboration record
+          collaborator = userWedding;
+        } else {
+          // User is trying to access a different wedding than their own
+          return res.status(403).json({ error: 'Access denied to this wedding' });
         }
-      });
-      await collaborator.save();
+      } else {
+        return res.status(404).json({ error: 'No wedding found for user' });
+      }
     }
 
     res.json({
@@ -286,6 +321,89 @@ router.delete('/:weddingId/:collaboratorId', authenticateToken, async (req, res)
   } catch (error) {
     console.error('Remove collaborator error:', error);
     res.status(500).json({ error: 'Failed to remove collaborator' });
+  }
+});
+
+// Join wedding by ID
+router.post('/join', authenticateToken, async (req, res) => {
+  try {
+    const { weddingId, role } = req.body;
+
+    if (!weddingId) {
+      return res.status(400).json({ error: 'Wedding ID is required' });
+    }
+
+    // Check if wedding exists
+    const Wedding = require('../models/Wedding');
+    const wedding = await Wedding.findById(weddingId);
+    if (!wedding) {
+      return res.status(404).json({ error: 'Wedding not found' });
+    }
+
+    // Check if user is already a collaborator for this wedding
+    const existingCollaborator = await Collaborator.findOne({
+      weddingId,
+      userId: req.user._id
+    });
+
+    if (existingCollaborator) {
+      if (existingCollaborator.status === 'accepted') {
+        return res.status(400).json({ error: 'You are already a collaborator for this wedding' });
+      } else if (existingCollaborator.status === 'pending') {
+        return res.status(400).json({ error: 'You already have a pending invitation for this wedding' });
+      }
+    }
+
+    // Check if user already has an active wedding
+    const userActiveWedding = await Collaborator.findOne({
+      userId: req.user._id,
+      status: 'accepted'
+    });
+
+    if (userActiveWedding) {
+      return res.status(400).json({ error: 'You already have an active wedding. You can only join one wedding at a time.' });
+    }
+
+    // Get permissions based on role
+    const permissions = getRolePermissions(role || 'Friend');
+
+    // Create new collaboration
+    const collaborator = new Collaborator({
+      weddingId,
+      userId: req.user._id,
+      role: role || 'Friend', // Default role, can be changed by wedding owner
+      email: req.user.email,
+      name: req.user.name,
+      status: 'accepted', // Auto-accept for now (in production, might require approval)
+      invitedBy: wedding.createdBy,
+      invitedAt: new Date(),
+      acceptedAt: new Date(),
+      permissions
+    });
+
+    await collaborator.save();
+
+    res.status(201).json({
+      message: 'Successfully joined wedding',
+      wedding: {
+        id: wedding._id,
+        name: wedding.name,
+        weddingDate: wedding.weddingDate,
+        venue: wedding.venue,
+        theme: wedding.theme
+      },
+      collaborator: {
+        role: collaborator.role,
+        status: collaborator.status,
+        permissions: collaborator.permissions
+      }
+    });
+  } catch (error) {
+    console.error('Join wedding error:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: Object.values(error.errors).map(err => err.message) });
+    }
+    res.status(500).json({ error: 'Failed to join wedding' });
   }
 });
 

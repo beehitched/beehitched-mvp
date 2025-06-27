@@ -29,7 +29,7 @@ interface RSVPForm {
   name: string
   email: string
   phone: string
-  rsvpStatus: 'attending' | 'declined' | 'maybe'
+  rsvpStatus: 'Pending' | 'Attending' | 'Not Attending' | 'Maybe'
   plusOne: boolean
   plusOneName: string
   dietaryRestrictions: string
@@ -48,7 +48,7 @@ export default function RSVPPage({ params }: { params: { weddingId: string } }) 
     name: '',
     email: '',
     phone: '',
-    rsvpStatus: 'attending',
+    rsvpStatus: 'Pending',
     plusOne: false,
     plusOneName: '',
     dietaryRestrictions: '',
@@ -261,9 +261,9 @@ export default function RSVPPage({ params }: { params: { weddingId: string } }) 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <button
                     type="button"
-                    onClick={() => setForm({...form, rsvpStatus: 'attending'})}
+                    onClick={() => setForm({...form, rsvpStatus: 'Attending'})}
                     className={`p-4 rounded-lg border-2 transition-all ${
-                      form.rsvpStatus === 'attending'
+                      form.rsvpStatus === 'Attending'
                         ? 'border-green-500 bg-green-50 text-green-700'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -274,9 +274,9 @@ export default function RSVPPage({ params }: { params: { weddingId: string } }) 
                   
                   <button
                     type="button"
-                    onClick={() => setForm({...form, rsvpStatus: 'maybe'})}
+                    onClick={() => setForm({...form, rsvpStatus: 'Maybe'})}
                     className={`p-4 rounded-lg border-2 transition-all ${
-                      form.rsvpStatus === 'maybe'
+                      form.rsvpStatus === 'Maybe'
                         ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -287,21 +287,21 @@ export default function RSVPPage({ params }: { params: { weddingId: string } }) 
                   
                   <button
                     type="button"
-                    onClick={() => setForm({...form, rsvpStatus: 'declined'})}
+                    onClick={() => setForm({...form, rsvpStatus: 'Not Attending'})}
                     className={`p-4 rounded-lg border-2 transition-all ${
-                      form.rsvpStatus === 'declined'
+                      form.rsvpStatus === 'Not Attending'
                         ? 'border-red-500 bg-red-50 text-red-700'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <XCircle className="w-6 h-6 mx-auto mb-2" />
-                    <span className="font-medium">Declined</span>
+                    <span className="font-medium">Not Attending</span>
                   </button>
                 </div>
               </div>
 
               {/* Plus One */}
-              {form.rsvpStatus === 'attending' && (
+              {form.rsvpStatus === 'Attending' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                     Plus One
@@ -338,7 +338,7 @@ export default function RSVPPage({ params }: { params: { weddingId: string } }) 
               )}
 
               {/* Additional Information */}
-              {form.rsvpStatus === 'attending' && (
+              {form.rsvpStatus === 'Attending' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
                     Additional Information

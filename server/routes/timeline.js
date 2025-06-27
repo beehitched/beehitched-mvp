@@ -7,6 +7,16 @@ const router = express.Router();
 // Get all tasks for a user
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     const tasks = await Task.find({ user: req.user._id })
       .sort({ order: 1, createdAt: -1 });
 
@@ -34,33 +44,18 @@ router.post('/', authenticateToken, async (req, res) => {
       notes
     } = req.body;
 
-    // Check if user has permission to edit timeline
-    let collaborator = await Collaborator.findOne({ 
-      weddingId: req.user._id, 
-      userId: req.user._id 
-    });
-    
-    // If no collaborator record exists, create one for the user as owner
-    if (!collaborator) {
-      collaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
-        userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
-        }
-      });
-      await collaborator.save();
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
     }
-    
-    if (!collaborator.permissions.canEditTimeline) {
+
+    // Check if user has permission to edit timeline
+    if (!userWedding.permissions.canEditTimeline) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -105,33 +100,18 @@ router.put('/:taskId', authenticateToken, async (req, res) => {
     const { taskId } = req.params;
     const updateData = req.body;
 
-    // Check if user has permission to edit timeline
-    let collaborator = await Collaborator.findOne({ 
-      weddingId: req.user._id, 
-      userId: req.user._id 
-    });
-    
-    // If no collaborator record exists, create one for the user as owner
-    if (!collaborator) {
-      collaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
-        userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
-        }
-      });
-      await collaborator.save();
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
     }
-    
-    if (!collaborator.permissions.canEditTimeline) {
+
+    // Check if user has permission to edit timeline
+    if (!userWedding.permissions.canEditTimeline) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -170,33 +150,18 @@ router.delete('/:taskId', authenticateToken, async (req, res) => {
   try {
     const { taskId } = req.params;
 
-    // Check if user has permission to edit timeline
-    let collaborator = await Collaborator.findOne({ 
-      weddingId: req.user._id, 
-      userId: req.user._id 
-    });
-    
-    // If no collaborator record exists, create one for the user as owner
-    if (!collaborator) {
-      collaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
-        userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
-        }
-      });
-      await collaborator.save();
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
     }
-    
-    if (!collaborator.permissions.canEditTimeline) {
+
+    // Check if user has permission to edit timeline
+    if (!userWedding.permissions.canEditTimeline) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -219,33 +184,18 @@ router.put('/:taskId/order', authenticateToken, async (req, res) => {
     const { taskId } = req.params;
     const { newOrder, newCategory } = req.body;
 
-    // Check if user has permission to edit timeline
-    let collaborator = await Collaborator.findOne({ 
-      weddingId: req.user._id, 
-      userId: req.user._id 
-    });
-    
-    // If no collaborator record exists, create one for the user as owner
-    if (!collaborator) {
-      collaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
-        userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
-        }
-      });
-      await collaborator.save();
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
     }
-    
-    if (!collaborator.permissions.canEditTimeline) {
+
+    // Check if user has permission to edit timeline
+    if (!userWedding.permissions.canEditTimeline) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -319,33 +269,18 @@ router.put('/:taskId/complete', authenticateToken, async (req, res) => {
     const { taskId } = req.params;
     const { isCompleted } = req.body;
 
-    // Check if user has permission to edit timeline
-    let collaborator = await Collaborator.findOne({ 
-      weddingId: req.user._id, 
-      userId: req.user._id 
-    });
-    
-    // If no collaborator record exists, create one for the user as owner
-    if (!collaborator) {
-      collaborator = new Collaborator({
-        weddingId: req.user._id, // Use user ID as wedding ID
-        userId: req.user._id,
-        role: 'Owner',
-        email: req.user.email,
-        name: req.user.name,
-        status: 'accepted',
-        permissions: {
-          canEditTimeline: true,
-          canEditGuests: true,
-          canInviteOthers: true,
-          canManageRoles: true,
-          canViewBudget: true
-        }
-      });
-      await collaborator.save();
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
     }
-    
-    if (!collaborator.permissions.canEditTimeline) {
+
+    // Check if user has permission to edit timeline
+    if (!userWedding.permissions.canEditTimeline) {
       return res.status(403).json({ error: 'Permission denied' });
     }
 

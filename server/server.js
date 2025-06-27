@@ -8,9 +8,9 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const timelineRoutes = require('./routes/timeline');
 const guestRoutes = require('./routes/guests');
-const shopRoutes = require('./routes/shop');
 const weddingRoutes = require('./routes/weddings');
 const collaborationRoutes = require('./routes/collaboration');
+const messageRoutes = require('./routes/messages');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,9 +45,9 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/beehitche
 app.use('/api/auth', authRoutes);
 app.use('/api/timeline', timelineRoutes);
 app.use('/api/guests', guestRoutes);
-app.use('/api/shop', shopRoutes);
 app.use('/api/weddings', weddingRoutes);
 app.use('/api/collaboration', collaborationRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

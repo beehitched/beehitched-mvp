@@ -7,35 +7,38 @@ import {
   Heart, 
   Calendar, 
   Users, 
-  ShoppingBag, 
   CheckCircle, 
   Star,
   ArrowRight,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  UserPlus,
+  Shield,
+  MessageSquare,
+  Clock
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 const features = [
   {
     icon: Calendar,
-    title: 'Timeline Planning',
-    description: 'Organize your wedding tasks with our intuitive drag-and-drop timeline board.'
+    title: 'Step 1: Create Your Wedding',
+    description: 'Sign up and create your wedding profile. Add your wedding date, venue, and theme to get started.'
   },
   {
-    icon: Users,
-    title: 'Guest Management',
-    description: 'Keep track of RSVPs, dietary restrictions, and seating arrangements.'
-  },
-  {
-    icon: ShoppingBag,
-    title: 'Wedding Shop',
-    description: 'Discover beautiful wedding essentials from invitations to decor.'
+    icon: UserPlus,
+    title: 'Step 2: Invite Collaborators',
+    description: 'Invite family, friends, and wedding party members to help with planning. Set roles and permissions.'
   },
   {
     icon: CheckCircle,
-    title: 'Task Tracking',
-    description: 'Never miss a deadline with our comprehensive task management system.'
+    title: 'Step 3: Build Your Timeline',
+    description: 'Create tasks, set due dates, and organize everything in our intuitive timeline board.'
+  },
+  {
+    icon: Users,
+    title: 'Step 4: Manage Guests',
+    description: 'Add guests, generate QR codes for RSVPs, and track responses in real-time.'
   }
 ]
 
@@ -52,7 +55,7 @@ const testimonials = [
   },
   {
     name: 'Jessica & Chris',
-    text: 'We found everything we needed in the wedding shop. The quality and selection are amazing!',
+    text: 'The collaboration features made planning with our families so much easier. Everyone could contribute while we stayed in control.',
     rating: 5
   }
 ]
@@ -130,10 +133,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-serif font-bold text-gray-900 mb-4">
-              Everything You Need to Plan Your Wedding
+              How to Use BeeHitched
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From timeline management to guest coordination, we've got you covered.
+              Get started in just 4 simple steps. From creating your wedding to managing guests, we'll guide you through everything.
             </p>
           </div>
           
@@ -144,8 +147,11 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="card-hover p-6 text-center"
+                className="card-hover p-6 text-center relative"
               >
+                <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  {index + 1}
+                </div>
                 <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-8 h-8 text-primary-600" />
                 </div>
@@ -215,6 +221,250 @@ export default function HomePage() {
                       <div className="text-sm text-gray-600">Due: April 1</div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Collaborators Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="card p-8 bg-gradient-to-br from-primary-50 to-gold-50 border border-primary-100">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                    <UserPlus className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Invite Collaborators</h3>
+                    <p className="text-sm text-gray-600">Share the planning journey</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center p-3 bg-white/60 rounded-lg">
+                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm font-semibold text-primary-600">S</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">Sarah (Maid of Honor)</div>
+                      <div className="text-xs text-gray-500">Managing bridesmaid coordination</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 bg-white/60 rounded-lg">
+                    <div className="w-8 h-8 bg-gold-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm font-semibold text-gold-600">M</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">Mom (Wedding Coordinator)</div>
+                      <div className="text-xs text-gray-500">Overseeing vendor management</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 bg-white/60 rounded-lg">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm font-semibold text-green-600">J</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-sm">James (Best Man)</div>
+                      <div className="text-xs text-gray-500">Handling groomsmen logistics</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">
+                Plan Together with Loved Ones
+              </h2>
+              <p className="text-xl text-gray-600 mb-8">
+                Invite family, friends, and wedding party members to collaborate on your special day. 
+                Everyone can contribute while you maintain full control.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <Users className="w-5 h-5 text-primary-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Delegate Tasks</h3>
+                    <p className="text-gray-600">Assign specific responsibilities to trusted family members and friends. Let your maid of honor handle bridesmaid coordination while your mom manages vendor communications.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-gold-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <MessageSquare className="w-5 h-5 text-gold-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Real-time Communication</h3>
+                    <p className="text-gray-600">Keep everyone in the loop with built-in messaging and updates. No more endless group texts or missed information.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <Shield className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Maintain Control</h3>
+                    <p className="text-gray-600">You decide who sees what. Set permissions for each collaborator and approve changes before they go live.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Save Time</h3>
+                    <p className="text-gray-600">Distribute the workload and focus on what matters most. Your wedding planning becomes a team effort, not a solo mission.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-8">
+                <Link href="/register" className="btn-primary inline-flex items-center">
+                  Start Collaborating
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Guest Management Section */}
+      <section className="py-20 gradient-bg">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">
+                Smart Guest Management with QR Codes
+              </h2>
+              <p className="text-xl text-gray-600 mb-8">
+                Make RSVP collection effortless with our innovative QR code system. 
+                Guests can respond instantly, and everything syncs automatically to your BeeHitched dashboard.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Instant QR Code Generation</h3>
+                    <p className="text-gray-600">Generate beautiful, custom QR codes for your invitations. Each code links directly to your personalized RSVP page with your wedding details.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Mobile-First RSVP Experience</h3>
+                    <p className="text-gray-600">Guests simply scan the QR code with their phone camera and instantly access your RSVP form. No apps to download, no accounts to create.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Real-Time Sync</h3>
+                    <p className="text-gray-600">Every RSVP response instantly appears in your BeeHitched dashboard. Track attendance, dietary restrictions, and guest preferences in real-time.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Comprehensive Analytics</h3>
+                    <p className="text-gray-600">Get detailed insights into your guest responses. Track RSVP rates, dietary preferences, and generate seating charts automatically.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-8">
+                <Link href="/register" className="btn-primary inline-flex items-center">
+                  Start Managing Guests
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="card p-8 bg-white/90 backdrop-blur-sm border border-gray-200">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Sarah & Michael's Wedding</h3>
+                  <p className="text-sm text-gray-600">Scan to RSVP</p>
+                </div>
+                
+                {/* QR Code Placeholder */}
+                <div className="flex justify-center mb-6">
+                  <div className="w-48 h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                    <div className="text-center">
+                      <svg className="w-16 h-16 text-gray-400 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/>
+                      </svg>
+                      <p className="text-sm text-gray-500">QR Code</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-sm">Confirmed</div>
+                      <div className="text-xs text-gray-600">RSVP responses</div>
+                    </div>
+                    <div className="text-2xl font-bold text-green-600">127</div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-sm">Pending</div>
+                      <div className="text-xs text-gray-600">Awaiting response</div>
+                    </div>
+                    <div className="text-2xl font-bold text-blue-600">23</div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <div>
+                      <div className="font-medium text-sm">Dietary Needs</div>
+                      <div className="text-xs text-gray-600">Special requirements</div>
+                    </div>
+                    <div className="text-2xl font-bold text-purple-600">8</div>
+                  </div>
+                </div>
+                
+                <div className="mt-6 text-center">
+                  <p className="text-xs text-gray-500">
+                    QR codes automatically sync with your BeeHitched dashboard
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -336,7 +586,6 @@ export default function HomePage() {
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="/shop" className="hover:text-white transition-colors">Wedding Shop</Link></li>
               </ul>
             </div>
             <div>

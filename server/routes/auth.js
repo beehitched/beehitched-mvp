@@ -1,12 +1,14 @@
 const express = require('express');
 const User = require('../models/User');
+const Wedding = require('../models/Wedding');
+const Collaborator = require('../models/Collaborator');
 const { generateToken, authenticateToken } = require('../utils/auth');
 const router = express.Router();
 
 // Register new user
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, partnerName, weddingDate } = req.body;
+    const { name, email, password } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -18,9 +20,7 @@ router.post('/register', async (req, res) => {
     const user = new User({
       name,
       email,
-      password,
-      partnerName,
-      weddingDate: weddingDate ? new Date(weddingDate) : null
+      password
     });
 
     await user.save();
@@ -34,9 +34,7 @@ router.post('/register', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
-        partnerName: user.partnerName,
-        weddingDate: user.weddingDate
+        email: user.email
       }
     });
   } catch (error) {
@@ -78,13 +76,7 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
-        partnerName: user.partnerName,
-        weddingDate: user.weddingDate,
-        budget: user.budget,
-        guestCount: user.guestCount,
-        venue: user.venue,
-        theme: user.theme
+        email: user.email
       }
     });
   } catch (error) {
@@ -101,12 +93,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
         id: req.user._id,
         name: req.user.name,
         email: req.user.email,
-        partnerName: req.user.partnerName,
-        weddingDate: req.user.weddingDate,
-        budget: req.user.budget,
-        guestCount: req.user.guestCount,
-        venue: req.user.venue,
-        theme: req.user.theme,
         lastLogin: req.user.lastLogin
       }
     });
@@ -119,16 +105,11 @@ router.get('/profile', authenticateToken, async (req, res) => {
 // Update user profile
 router.put('/profile', authenticateToken, async (req, res) => {
   try {
-    const { name, partnerName, weddingDate, budget, guestCount, venue, theme } = req.body;
+    const { name, email } = req.body;
 
     const updateData = {};
     if (name) updateData.name = name;
-    if (partnerName !== undefined) updateData.partnerName = partnerName;
-    if (weddingDate !== undefined) updateData.weddingDate = weddingDate ? new Date(weddingDate) : null;
-    if (budget !== undefined) updateData.budget = budget;
-    if (guestCount !== undefined) updateData.guestCount = guestCount;
-    if (venue !== undefined) updateData.venue = venue;
-    if (theme !== undefined) updateData.theme = theme;
+    if (email) updateData.email = email;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
@@ -138,7 +119,12 @@ router.put('/profile', authenticateToken, async (req, res) => {
 
     res.json({
       message: 'Profile updated successfully',
-      user: updatedUser
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        lastLogin: updatedUser.lastLogin
+      }
     });
   } catch (error) {
     console.error('Profile update error:', error);
@@ -189,5 +175,124 @@ router.delete('/account', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Account deletion failed' });
   }
 });
+
+// Create wedding for existing user
+router.post('/create-wedding', authenticateToken, async (req, res) => {
+  try {
+    const { name, weddingDate, partnerName, venue, theme, budget, guestCount, role } = req.body;
+
+    // Check if user already has a wedding
+    const existingCollaboration = await Collaborator.findOne({
+      userId: req.user._id,
+      status: 'accepted'
+    });
+
+    if (existingCollaboration) {
+      return res.status(400).json({ error: 'User already has an active wedding' });
+    }
+
+    // Create new wedding
+    const wedding = new Wedding({
+      name: name || `${req.user.name} & ${partnerName || 'Partner'}'s Wedding`,
+      weddingDate: weddingDate ? new Date(weddingDate) : null,
+      venue: venue || '',
+      theme: theme || '',
+      budget: budget || 0,
+      guestCount: guestCount || 0,
+      description: `${req.user.name} and ${partnerName || 'Partner'}'s special day`,
+      createdBy: req.user._id
+    });
+
+    await wedding.save();
+
+    // Get permissions based on role
+    const permissions = getRolePermissions(role || 'Owner');
+
+    // Create initial collaboration (user as owner of their wedding)
+    const collaboration = new Collaborator({
+      weddingId: wedding._id,
+      userId: req.user._id,
+      role: role || 'Owner',
+      email: req.user.email,
+      name: req.user.name,
+      status: 'accepted',
+      invitedBy: req.user._id,
+      acceptedAt: new Date(),
+      permissions
+    });
+
+    await collaboration.save();
+
+    res.status(201).json({
+      message: 'Wedding created successfully',
+      wedding: {
+        id: wedding._id,
+        name: wedding.name,
+        weddingDate: wedding.weddingDate,
+        venue: wedding.venue,
+        theme: wedding.theme,
+        budget: wedding.budget,
+        guestCount: wedding.guestCount
+      }
+    });
+  } catch (error) {
+    console.error('Wedding creation error:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: Object.values(error.errors).map(err => err.message) });
+    }
+    res.status(500).json({ error: 'Wedding creation failed' });
+  }
+});
+
+// Helper function to get permissions based on role
+function getRolePermissions(role) {
+  const permissions = {
+    canView: true,
+    canEditTimeline: false,
+    canEditGuests: false,
+    canEditShop: false,
+    canInviteOthers: false,
+    canManageRoles: false
+  };
+
+  switch (role) {
+    case 'Owner':
+      permissions.canEditTimeline = true;
+      permissions.canEditGuests = true;
+      permissions.canEditShop = true;
+      permissions.canInviteOthers = true;
+      permissions.canManageRoles = true;
+      break;
+    case 'Bride':
+    case 'Groom':
+      permissions.canEditTimeline = true;
+      permissions.canEditGuests = true;
+      permissions.canEditShop = true;
+      permissions.canInviteOthers = true;
+      break;
+    case 'Planner':
+      permissions.canEditTimeline = true;
+      permissions.canEditGuests = true;
+      permissions.canEditShop = true;
+      permissions.canInviteOthers = true;
+      break;
+    case 'Maid of Honor':
+    case 'Best Man':
+      permissions.canEditTimeline = true;
+      permissions.canEditGuests = false;
+      permissions.canEditShop = false;
+      break;
+    case 'Parent':
+      permissions.canEditTimeline = false;
+      permissions.canEditGuests = true;
+      permissions.canEditShop = false;
+      break;
+    default:
+      // Friend, Sibling, Other - view only
+      break;
+  }
+
+  return permissions;
+}
 
 module.exports = router; 

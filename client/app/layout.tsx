@@ -8,9 +8,9 @@ import { AuthProvider } from '@/contexts/AuthContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BeeHitched - Wedding Planning Made Simple',
-  description: 'Plan your perfect wedding with our elegant, intuitive wedding planning platform. Manage tasks, guests, and shop for everything you need.',
-  keywords: 'wedding planning, wedding organizer, wedding tasks, guest management, wedding shop',
+  title: 'BeeHitched - Elegant Wedding Planning Made Simple',
+  description: 'Plan your perfect wedding with our elegant, intuitive wedding planning platform. Manage tasks, guests, and collaborate with loved ones.',
+  keywords: 'wedding planning, wedding organizer, wedding tasks, guest management, wedding collaboration',
   authors: [{ name: 'BeeHitched Team' }],
   openGraph: {
     title: 'BeeHitched - Wedding Planning Made Simple',
