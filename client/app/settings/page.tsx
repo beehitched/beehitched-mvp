@@ -73,16 +73,16 @@ interface Collaborator {
 export default function SettingsPage() {
   const { user, token, updateUser } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
+  const [initialLoading, setInitialLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([])
-  const [myRole, setMyRole] = useState<any>(null)
-  const [initialLoading, setInitialLoading] = useState(true)
-
+  const [currentWeddingId, setCurrentWeddingId] = useState<string>('')
+  
+  // Profile settings
   const [profile, setProfile] = useState<UserProfile>({
-    name: user?.name || '',
-    email: user?.email || '',
+    name: '',
+    email: '',
     phone: '',
     avatar: '',
     partnerName: '',
@@ -90,6 +90,7 @@ export default function SettingsPage() {
     partnerPhone: ''
   })
 
+  // Wedding details
   const [weddingDetails, setWeddingDetails] = useState<WeddingDetails>({
     weddingDate: '',
     venue: '',
@@ -102,6 +103,7 @@ export default function SettingsPage() {
     colors: []
   })
 
+  // Notification settings
   const [notifications, setNotifications] = useState<NotificationSettings>({
     emailNotifications: true,
     pushNotifications: true,
@@ -111,11 +113,16 @@ export default function SettingsPage() {
     weeklyDigest: false
   })
 
+  // Password change
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   })
+
+  // Collaboration
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([])
+  const [myRole, setMyRole] = useState<any>(null)
 
   const colorOptions = [
     { name: 'Blush Pink', value: '#FCE7F3' },
@@ -145,13 +152,8 @@ export default function SettingsPage() {
     const loadData = async () => {
       setInitialLoading(true)
       try {
+        await fetchCurrentWedding()
         await fetchSettings()
-        if (user) {
-          await Promise.all([
-            fetchCollaborators(),
-            fetchMyRole()
-          ])
-        }
       } catch (error) {
         console.error('Error loading settings data:', error)
       } finally {
@@ -161,6 +163,33 @@ export default function SettingsPage() {
     
     loadData()
   }, [user])
+
+  const fetchCurrentWedding = async () => {
+    try {
+      const response = await fetch(`${API_URL}/collaboration/user/weddings`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.weddings && data.weddings.length > 0) {
+          const weddingId = data.weddings[0].id
+          setCurrentWeddingId(weddingId)
+          
+          // Fetch collaborators and role data for this wedding
+          if (user) {
+            await Promise.all([
+              fetchCollaborators(weddingId),
+              fetchMyRole(weddingId)
+            ])
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching current wedding:', error)
+    }
+  }
 
   const fetchSettings = async () => {
     try {
@@ -201,9 +230,12 @@ export default function SettingsPage() {
     }
   }
 
-  const fetchCollaborators = async () => {
+  const fetchCollaborators = async (weddingId?: string) => {
     try {
-      const response = await fetch(`${API_URL}/collaboration/${user?._id || user?.id}`, {
+      const targetWeddingId = weddingId || currentWeddingId
+      if (!targetWeddingId) return
+      
+      const response = await fetch(`${API_URL}/collaboration/${targetWeddingId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -217,9 +249,12 @@ export default function SettingsPage() {
     }
   }
 
-  const fetchMyRole = async () => {
+  const fetchMyRole = async (weddingId?: string) => {
     try {
-      const response = await fetch(`${API_URL}/collaboration/${user?._id || user?.id}/my-role`, {
+      const targetWeddingId = weddingId || currentWeddingId
+      if (!targetWeddingId) return
+      
+      const response = await fetch(`${API_URL}/collaboration/${targetWeddingId}/my-role`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -352,7 +387,11 @@ export default function SettingsPage() {
 
   const handleInviteCollaborator = async (inviteData: { email: string; name: string; role: string }) => {
     try {
-      const response = await fetch(`${API_URL}/collaboration/${user?._id || user?.id}/invite`, {
+      if (!currentWeddingId) {
+        throw new Error('No wedding selected')
+      }
+      
+      const response = await fetch(`${API_URL}/collaboration/${currentWeddingId}/invite`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -362,7 +401,7 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        await fetchCollaborators() // Refresh the list
+        await fetchCollaborators(currentWeddingId) // Refresh the list
       } else {
         const error = await response.json()
         throw new Error(error.error || 'Failed to send invitation')
@@ -895,7 +934,7 @@ export default function SettingsPage() {
               {/* Invite Modal */}
               {showInviteModal && (
                 <InviteCollaboratorModal
-                  weddingId={user._id || user.id}
+                  weddingId={currentWeddingId}
                   onClose={() => setShowInviteModal(false)}
                   onInvite={handleInviteCollaborator}
                 />

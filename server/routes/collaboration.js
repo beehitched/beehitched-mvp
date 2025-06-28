@@ -42,6 +42,20 @@ router.get('/:weddingId', authenticateToken, async (req, res) => {
   try {
     const { weddingId } = req.params;
     
+    // First check if user is the wedding owner
+    const wedding = await Wedding.findById(weddingId);
+    const isOwner = wedding && wedding.createdBy.toString() === req.user._id.toString();
+    
+    if (isOwner) {
+      // User is the wedding owner, they can access all collaborators
+      const collaborators = await Collaborator.find({ weddingId })
+        .populate('userId', 'name email')
+        .populate('invitedBy', 'name')
+        .sort({ createdAt: -1 });
+
+      return res.json(collaborators);
+    }
+    
     // Find the user's wedding through collaboration
     const userWedding = await Collaborator.findOne({ 
       userId: req.user._id,
@@ -94,9 +108,21 @@ router.get('/:weddingId/my-role', authenticateToken, async (req, res) => {
       userId: req.user._id 
     });
 
-    // If no collaborator record exists for this wedding, check if user has any wedding
+    // If no collaborator record exists for this wedding, check if user is the wedding owner
     if (!collaborator) {
-      // Find the user's wedding through collaboration
+      const wedding = await Wedding.findById(weddingId);
+      const isOwner = wedding && wedding.createdBy.toString() === req.user._id.toString();
+      
+      if (isOwner) {
+        // User is the wedding owner, return owner permissions
+        return res.json({
+          role: 'Owner',
+          permissions: getRolePermissions('Owner'),
+          status: 'accepted'
+        });
+      }
+      
+      // Check if user has any wedding through collaboration
       const userWedding = await Collaborator.findOne({ 
         userId: req.user._id,
         status: 'accepted'
@@ -133,14 +159,30 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
     const { weddingId } = req.params;
     const { email, name, role } = req.body;
 
+    // Check if wedding exists
+    const wedding = await Wedding.findById(weddingId);
+    if (!wedding) {
+      return res.status(404).json({ error: 'Wedding not found' });
+    }
+
+    // Check if user is the wedding owner
+    const isOwner = wedding.createdBy.toString() === req.user._id.toString();
+
     // Check if user has permission to invite
     const currentCollaborator = await Collaborator.findOne({ 
       weddingId, 
       userId: req.user._id 
     });
     
-    if (!currentCollaborator || !currentCollaborator.permissions.canInviteOthers) {
-      return res.status(403).json({ error: 'Permission denied' });
+    // Allow if user is owner or has invite permissions
+    if (!isOwner) {
+      if (!currentCollaborator) {
+        return res.status(403).json({ error: 'Access denied - you are not a collaborator for this wedding' });
+      }
+      
+      if (!currentCollaborator.permissions || !currentCollaborator.permissions.canInviteOthers) {
+        return res.status(403).json({ error: 'Permission denied - you cannot invite others to this wedding' });
+      }
     }
 
     // Check if user already exists
@@ -183,8 +225,6 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
 
     // Fetch inviter's name
     const inviter = await User.findById(req.user._id);
-    // Fetch wedding for join link
-    const wedding = await Wedding.findById(weddingId);
     // Get recipient's first name
     const recipientFirstName = name.split(' ')[0];
     // Build join link (now to login page)
