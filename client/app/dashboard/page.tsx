@@ -54,11 +54,13 @@ interface Guest {
 
 interface Collaborator {
   _id: string
-  userId: {
+  userId?: {
     _id: string
     name: string
     email: string
   }
+  name: string
+  email: string
   role: string
   status: 'pending' | 'accepted' | 'declined'
 }
@@ -685,12 +687,12 @@ export default function DashboardPage() {
                     <div key={collaborator._id} className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                         <span className="text-sm font-medium text-purple-600">
-                          {collaborator.userId.name.charAt(0)}
+                          {collaborator.userId?.name?.charAt(0) || ''}
                         </span>
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">
-                          {collaborator.userId.name}
+                          {collaborator.userId?.name || ''}
                         </p>
                         <p className="text-sm text-gray-600">{collaborator.role}</p>
                       </div>

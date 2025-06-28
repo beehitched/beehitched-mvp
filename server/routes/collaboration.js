@@ -273,7 +273,11 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
       message: 'Invitation sent successfully',
       collaborator: {
         ...collaborator.toObject(),
-        userId: invitedUser
+        userId: invitedUser ? {
+          _id: invitedUser._id,
+          name: invitedUser.name,
+          email: invitedUser.email
+        } : null
       }
     });
   } catch (error) {

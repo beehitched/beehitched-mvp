@@ -36,11 +36,13 @@ interface Message {
 
 interface Collaborator {
   _id: string
-  userId: {
+  userId?: {
     _id: string
     name: string
     email: string
   }
+  name: string
+  email: string
   role: string
   status: 'pending' | 'accepted' | 'declined'
 }
@@ -77,7 +79,7 @@ export default function MessagingSystem({ collaborators }: MessagingSystemProps)
     try {
       console.log('Fetching messages...')
       
-      const endpoint = chatType === 'group' ? '/messages' : `/messages/individual/${selectedCollaborator?.userId._id}`
+      const endpoint = chatType === 'group' ? '/messages' : `/messages/individual/${selectedCollaborator?.userId?._id}`
       const response = await fetch(`${API_URL}${endpoint}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -108,7 +110,7 @@ export default function MessagingSystem({ collaborators }: MessagingSystemProps)
     const messageData = {
       content: newMessage,
       type: chatType,
-      ...(chatType === 'individual' && selectedCollaborator && {
+      ...(chatType === 'individual' && selectedCollaborator?.userId && {
         recipientId: selectedCollaborator.userId._id
       })
     }
@@ -175,9 +177,9 @@ export default function MessagingSystem({ collaborators }: MessagingSystemProps)
     }
   }
 
-  const activeCollaborators = collaborators.filter(c => c.status === 'accepted')
+  const activeCollaborators = collaborators.filter(c => c.status === 'accepted' && c.userId)
   const filteredCollaborators = activeCollaborators.filter(c => 
-    c.userId.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.userId?.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
     c.role.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -266,13 +268,13 @@ export default function MessagingSystem({ collaborators }: MessagingSystemProps)
                       <Users className="w-5 h-5" />
                     ) : (
                       <span className="text-sm font-bold">
-                        {getInitials(selectedCollaborator?.userId.name || '')}
+                        {getInitials(selectedCollaborator?.userId?.name || '')}
                       </span>
                     )}
                   </div>
                   <div>
                     <h3 className="font-semibold">
-                      {chatType === 'group' ? 'Wedding Chat' : selectedCollaborator?.userId.name}
+                      {chatType === 'group' ? 'Wedding Chat' : selectedCollaborator?.userId?.name}
                     </h3>
                     <p className="text-xs opacity-90">
                       {chatType === 'group' 
@@ -355,11 +357,11 @@ export default function MessagingSystem({ collaborators }: MessagingSystemProps)
                           >
                             <div className="flex items-center space-x-3">
                               <div className="w-10 h-10 bg-gradient-to-r from-pink-100 via-pink-200 to-pink-400 rounded-full flex items-center justify-center text-gray-800 font-bold">
-                                {getInitials(collaborator.userId.name)}
+                                {getInitials(collaborator.userId?.name || '')}
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2">
-                                  <span className="font-medium text-gray-900">{collaborator.userId.name}</span>
+                                  <span className="font-medium text-gray-900">{collaborator.userId?.name}</span>
                                   {getRoleIcon(collaborator.role)}
                                 </div>
                                 <p className="text-sm text-gray-600">{collaborator.role}</p>
