@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Heart, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -19,23 +19,23 @@ export default function ResetPasswordPage() {
   const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-    if (!isClient) return
-
-    const tokenParam = searchParams?.get('token')
-    if (!tokenParam) {
-      toast.error('Invalid reset link')
-      router.push('/login')
-      return
+    
+    // Get token from URL params on client side
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const tokenParam = urlParams.get('token')
+      
+      if (!tokenParam) {
+        toast.error('Invalid reset link')
+        router.push('/login')
+        return
+      }
+      setToken(tokenParam)
     }
-    setToken(tokenParam)
-  }, [searchParams, router, isClient])
+  }, [router])
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
