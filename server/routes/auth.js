@@ -181,16 +181,6 @@ router.post('/create-wedding', authenticateToken, async (req, res) => {
   try {
     const { name, weddingDate, partnerName, venue, theme, budget, guestCount, role } = req.body;
 
-    // Check if user already has a wedding
-    const existingCollaboration = await Collaborator.findOne({
-      userId: req.user._id,
-      status: 'accepted'
-    });
-
-    if (existingCollaboration) {
-      return res.status(400).json({ error: 'User already has an active wedding' });
-    }
-
     // Create new wedding
     const wedding = new Wedding({
       name: name || `${req.user.name} & ${partnerName || 'Partner'}'s Wedding`,
@@ -236,11 +226,11 @@ router.post('/create-wedding', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Wedding creation error:', error);
+    console.error('Create wedding error:', error);
     if (error.name === 'ValidationError') {
       return res.status(400).json({ error: Object.values(error.errors).map(err => err.message) });
     }
-    res.status(500).json({ error: 'Wedding creation failed' });
+    res.status(500).json({ error: 'Failed to create wedding' });
   }
 });
 

@@ -76,6 +76,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [hasWedding, setHasWedding] = useState(false)
   const [wedding, setWedding] = useState<any>(null)
+  const [weddings, setWeddings] = useState<any[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
   const [guests, setGuests] = useState<Guest[]>([])
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
@@ -85,47 +86,59 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user && token) {
-      checkWeddingStatus()
+      fetchUserWeddings()
     }
   }, [user, token])
 
   useEffect(() => {
-    if (wedding?.id && hasWedding) {
+    if (wedding?.id) {
       fetchDashboardData()
     }
-  }, [wedding, hasWedding])
+  }, [wedding])
 
-  const checkWeddingStatus = async () => {
+  // Fetch all weddings the user is a collaborator on
+  const fetchUserWeddings = async () => {
     try {
-      console.log('Checking wedding status for user:', user?.id)
-      const response = await fetch(`${API_URL}/collaboration/user/has-wedding`, {
+      const response = await fetch(`${API_URL}/collaboration/user/weddings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-
-      console.log('Wedding status response:', response.status)
       if (response.ok) {
         const data = await response.json()
-        console.log('Wedding status data:', data)
-        console.log('Wedding object:', data.wedding)
-        if (data.hasWedding) {
+        setWeddings(data.weddings)
+        if (data.weddings.length > 0) {
           setHasWedding(true)
-          setWedding(data.wedding)
+          setWedding(data.weddings[0]) // Default to first wedding
           setMyRole({
-            role: data.role,
-            permissions: data.permissions
+            role: data.weddings[0].role,
+            status: data.weddings[0].status
           })
         } else {
           setHasWedding(false)
-          setLoading(false)
+          setWedding(null)
         }
       } else {
         setHasWedding(false)
-        setLoading(false)
+        setWedding(null)
       }
-    } catch (error) {
-      console.error('Error checking wedding status:', error)
-      setHasWedding(false)
       setLoading(false)
+    } catch (error) {
+      setHasWedding(false)
+      setWedding(null)
+      setLoading(false)
+    }
+  }
+
+  // When user selects a different wedding
+  const handleWeddingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value
+    const selectedWedding = weddings.find(w => w.id === selectedId)
+    if (selectedWedding) {
+      setWedding(selectedWedding)
+      setMyRole({
+        role: selectedWedding.role,
+        status: selectedWedding.status
+      })
+      setLoading(true)
     }
   }
 
@@ -292,6 +305,25 @@ export default function DashboardPage() {
       <Navigation />
       
       <div className="container mx-auto px-4 py-8">
+        {/* Wedding Selector */}
+        {weddings.length > 1 && (
+          <div className="mb-6 flex items-center space-x-3">
+            <label htmlFor="wedding-selector" className="text-gray-700 font-medium">Select Wedding:</label>
+            <select
+              id="wedding-selector"
+              value={wedding?.id || ''}
+              onChange={handleWeddingChange}
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500"
+            >
+              {weddings.map(w => (
+                <option key={w.id} value={w.id}>
+                  {w.name} ({w.role})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

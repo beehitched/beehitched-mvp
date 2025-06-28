@@ -187,8 +187,8 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
     const wedding = await Wedding.findById(weddingId);
     // Get recipient's first name
     const recipientFirstName = name.split(' ')[0];
-    // Build join link
-    const joinUrl = `${process.env.CLIENT_URL || 'https://www.beehitched.com'}/join-wedding?weddingId=${weddingId}`;
+    // Build join link (now to login page)
+    const loginUrl = `${process.env.CLIENT_URL || 'https://www.beehitched.com'}/login`;
 
     // Build email content
     const subject = `You're invited to collaborate on a wedding with BeeHitched!`;
@@ -204,15 +204,15 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
           <li>Help keep the big day organized and stress-free</li>
         </ul>
         <p style="margin: 32px 0 16px 0; font-size: 1.1em;">👉 <b>Get Started:</b></p>
-        <a href="${joinUrl}" style="display: inline-block; background: #E6397E; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 1.1em;">Accept Your Invitation</a>
-        <p style="margin: 24px 0 8px 0; font-size: 1em; color: #444;">Or, if you prefer to join manually, use this Wedding ID:</p>
+        <a href="${loginUrl}" style="display: inline-block; background: #E6397E; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 1.1em;">Accept Your Invitation</a>
+        <p style="margin: 24px 0 8px 0; font-size: 1em; color: #444;">After signing in, if you don't have an account, please sign up. Then, use the Wedding ID below to join the wedding:</p>
         <div style="background: #f3f4f6; color: #E6397E; font-weight: bold; padding: 12px 18px; border-radius: 6px; font-size: 1.1em; letter-spacing: 1px; margin-bottom: 24px; display: inline-block;">${weddingId}</div>
         <p style="margin-top: 32px;">If you have any questions, we're always here to help at <a href="mailto:hello@beehitched.com">hello@beehitched.com</a>.</p>
         <p>Let's make wedding planning smoother (and way more fun) — together. 💍🐝</p>
         <p style="margin-top: 32px;">Warmly,<br/>The BeeHitched Team<br/><a href="https://www.beehitched.com">www.beehitched.com</a></p>
       </div>
     `;
-    const text = `Hi ${recipientFirstName},\n\nYou've been invited by ${inviter.name} to collaborate on their wedding planning journey using BeeHitched — a beautifully simple platform to organize timelines, assign tasks, and keep everything wedding-related in one place.\n\nWhether you're helping plan, making decisions, or just staying in the loop, everything you need is right here.\n\n- View and manage the wedding timeline\n- See what tasks are assigned to you\n- Share notes and updates in real-time\n- Help keep the big day organized and stress-free\n\nGet Started:\nAccept your invitation: ${joinUrl}\n\nOr, if you prefer to join manually, use this Wedding ID:\n${weddingId}\n\nIf you have any questions, we're always here to help at hello@beehitched.com.\n\nLet's make wedding planning smoother (and way more fun) — together. 💍🐝\n\nWarmly,\nThe BeeHitched Team\nwww.beehitched.com`;
+    const text = `Hi ${recipientFirstName},\n\nYou've been invited by ${inviter.name} to collaborate on their wedding planning journey using BeeHitched — a beautifully simple platform to organize timelines, assign tasks, and keep everything wedding-related in one place.\n\nWhether you're helping plan, making decisions, or just staying in the loop, everything you need is right here.\n\n- View and manage the wedding timeline\n- See what tasks are assigned to you\n- Share notes and updates in real-time\n- Help keep the big day organized and stress-free\n\nGet Started:\nAccept your invitation: ${loginUrl}\n\nAfter signing in, if you don't have an account, please sign up. Then, use the Wedding ID below to join the wedding:\n${weddingId}\n\nIf you have any questions, we're always here to help at hello@beehitched.com.\n\nLet's make wedding planning smoother (and way more fun) — together. 💍🐝\n\nWarmly,\nThe BeeHitched Team\nwww.beehitched.com`;
 
     // Send the invitation email
     await sendMail({
@@ -396,16 +396,6 @@ router.post('/join', authenticateToken, async (req, res) => {
       }
     }
 
-    // Check if user already has an active wedding
-    const userActiveWedding = await Collaborator.findOne({
-      userId: req.user._id,
-      status: 'accepted'
-    });
-
-    if (userActiveWedding) {
-      return res.status(400).json({ error: 'You already have an active wedding. You can only join one wedding at a time.' });
-    }
-
     // Get permissions based on role
     const permissions = getRolePermissions(role || 'Friend');
 
@@ -446,6 +436,33 @@ router.post('/join', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: Object.values(error.errors).map(err => err.message) });
     }
     res.status(500).json({ error: 'Failed to join wedding' });
+  }
+});
+
+// New: Get all weddings the user is a collaborator on
+router.get('/user/weddings', authenticateToken, async (req, res) => {
+  try {
+    const collaborations = await Collaborator.find({
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    const weddings = collaborations
+      .filter(collab => collab.weddingId) // Only include if weddingId is populated
+      .map(collab => ({
+        id: collab.weddingId._id,
+        name: collab.weddingId.name,
+        weddingDate: collab.weddingId.weddingDate,
+        venue: collab.weddingId.venue,
+        theme: collab.weddingId.theme,
+        role: collab.role,
+        status: collab.status
+      }));
+
+    res.json({ weddings });
+  } catch (error) {
+    console.error('Get user weddings error:', error);
+    res.status(500).json({ error: 'Failed to fetch user weddings' });
   }
 });
 
