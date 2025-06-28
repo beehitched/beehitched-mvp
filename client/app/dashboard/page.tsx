@@ -322,7 +322,7 @@ export default function DashboardPage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 px-4"
+        className="bg-pink-600 text-white py-4 px-4"
       >
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -338,7 +338,7 @@ export default function DashboardPage() {
             href="https://www.etsy.com/shop/BeeHitchedCo"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-white text-purple-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center space-x-2"
+            className="bg-white text-pink-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center space-x-2"
           >
             <span>Shop Now</span>
             <ChevronRight className="w-4 h-4" />

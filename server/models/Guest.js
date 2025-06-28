@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const guestSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Wedding',
     required: true
   },
   name: {
@@ -92,11 +92,11 @@ const guestSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for efficient queries
-guestSchema.index({ user: 1, rsvpStatus: 1 });
-guestSchema.index({ user: 1, group: 1 });
-guestSchema.index({ user: 1, isVip: 1 });
-guestSchema.index({ user: 1, email: 1 });
-guestSchema.index({ user: 1, assignedRoles: 1 });
+// Index for efficient queries (user field stores wedding ID)
+guestSchema.index({ user: 1, rsvpStatus: 1 }); // weddingId, rsvpStatus
+guestSchema.index({ user: 1, group: 1 }); // weddingId, group
+guestSchema.index({ user: 1, isVip: 1 }); // weddingId, isVip
+guestSchema.index({ user: 1, email: 1 }); // weddingId, email
+guestSchema.index({ user: 1, assignedRoles: 1 }); // weddingId, assignedRoles
 
 module.exports = mongoose.model('Guest', guestSchema); 

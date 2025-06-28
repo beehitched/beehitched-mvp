@@ -17,8 +17,15 @@ router.get('/', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'No wedding found for user' });
     }
 
-    const tasks = await Task.find({ user: req.user._id })
-      .sort({ order: 1, createdAt: -1 });
+    // Get all tasks for this wedding (handle both old and new task structure)
+    // Old tasks: user field contains user ID
+    // New tasks: user field contains wedding ID
+    const tasks = await Task.find({
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    }).sort({ order: 1, createdAt: -1 });
 
     // Return flat array instead of grouped data
     res.json(tasks);
@@ -68,7 +75,7 @@ router.post('/', authenticateToken, async (req, res) => {
     const order = lastTask ? lastTask.order + 1 : 0;
 
     const task = new Task({
-      user: req.user._id,
+      user: userWedding.weddingId._id,
       title,
       description,
       category,
@@ -126,7 +133,13 @@ router.put('/:taskId', authenticateToken, async (req, res) => {
     }
 
     const task = await Task.findOneAndUpdate(
-      { _id: taskId, user: req.user._id },
+      { 
+        _id: taskId, 
+        $or: [
+          { user: userWedding.weddingId._id }, // New structure: wedding ID
+          { user: req.user._id } // Old structure: user ID (for backward compatibility)
+        ]
+      },
       updateData,
       { new: true, runValidators: true }
     );
@@ -165,7 +178,13 @@ router.delete('/:taskId', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
-    const task = await Task.findOneAndDelete({ _id: taskId, user: req.user._id });
+    const task = await Task.findOneAndDelete({ 
+      _id: taskId, 
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    });
 
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
@@ -199,7 +218,13 @@ router.put('/:taskId/order', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
-    const task = await Task.findOne({ _id: taskId, user: req.user._id });
+    const task = await Task.findOne({ 
+      _id: taskId, 
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    });
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -212,7 +237,10 @@ router.put('/:taskId/order', authenticateToken, async (req, res) => {
       // Remove from old category
       await Task.updateMany(
         { 
-          user: req.user._id, 
+          $or: [
+            { user: userWedding.weddingId._id }, // New structure: wedding ID
+            { user: req.user._id } // Old structure: user ID (for backward compatibility)
+          ],
           category: oldCategory, 
           order: { $gt: oldOrder } 
         },
@@ -222,7 +250,10 @@ router.put('/:taskId/order', authenticateToken, async (req, res) => {
       // Add to new category
       await Task.updateMany(
         { 
-          user: req.user._id, 
+          $or: [
+            { user: userWedding.weddingId._id }, // New structure: wedding ID
+            { user: req.user._id } // Old structure: user ID (for backward compatibility)
+          ],
           category: newCategory, 
           order: { $gte: newOrder } 
         },
@@ -235,7 +266,10 @@ router.put('/:taskId/order', authenticateToken, async (req, res) => {
       if (newOrder > oldOrder) {
         await Task.updateMany(
           { 
-            user: req.user._id, 
+            $or: [
+              { user: userWedding.weddingId._id }, // New structure: wedding ID
+              { user: req.user._id } // Old structure: user ID (for backward compatibility)
+            ],
             category: oldCategory, 
             order: { $gt: oldOrder, $lte: newOrder } 
           },
@@ -244,7 +278,10 @@ router.put('/:taskId/order', authenticateToken, async (req, res) => {
       } else {
         await Task.updateMany(
           { 
-            user: req.user._id, 
+            $or: [
+              { user: userWedding.weddingId._id }, // New structure: wedding ID
+              { user: req.user._id } // Old structure: user ID (for backward compatibility)
+            ],
             category: oldCategory, 
             order: { $gte: newOrder, $lt: oldOrder } 
           },
@@ -284,7 +321,13 @@ router.put('/:taskId/complete', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Permission denied' });
     }
 
-    const task = await Task.findOne({ _id: taskId, user: req.user._id });
+    const task = await Task.findOne({ 
+      _id: taskId, 
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    });
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -304,8 +347,18 @@ router.put('/:taskId/complete', authenticateToken, async (req, res) => {
 // Get task statistics
 router.get('/stats', authenticateToken, async (req, res) => {
   try {
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     const stats = await Task.aggregate([
-      { $match: { user: req.user._id } },
+      { $match: { user: userWedding.weddingId._id } },
       {
         $group: {
           _id: '$status',
@@ -314,14 +367,14 @@ router.get('/stats', authenticateToken, async (req, res) => {
       }
     ]);
 
-    const totalTasks = await Task.countDocuments({ user: req.user._id });
+    const totalTasks = await Task.countDocuments({ user: userWedding.weddingId._id });
     const completedTasks = await Task.countDocuments({ 
-      user: req.user._id, 
+      user: userWedding.weddingId._id, 
       isCompleted: true 
     });
 
     const categoryStats = await Task.aggregate([
-      { $match: { user: req.user._id } },
+      { $match: { user: userWedding.weddingId._id } },
       {
         $group: {
           _id: '$category',

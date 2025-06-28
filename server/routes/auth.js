@@ -27,6 +27,29 @@ router.post('/register', async (req, res) => {
 
     await user.save();
 
+    // Check if there are any pending collaborator invitations for this email
+    const pendingInvitations = await Collaborator.find({ 
+      email: email.toLowerCase(), 
+      status: 'pending',
+      userId: null 
+    });
+
+    // Link any pending invitations to this new user
+    if (pendingInvitations.length > 0) {
+      await Collaborator.updateMany(
+        { 
+          email: email.toLowerCase(), 
+          status: 'pending',
+          userId: null 
+        },
+        { 
+          userId: user._id,
+          status: 'accepted',
+          acceptedAt: new Date()
+        }
+      );
+    }
+
     // Generate token
     const token = generateToken(user._id);
 
@@ -37,7 +60,8 @@ router.post('/register', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email
-      }
+      },
+      pendingInvitations: pendingInvitations.length
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -397,4 +421,4 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

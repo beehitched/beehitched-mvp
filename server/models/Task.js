@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const taskSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Wedding',
     required: true
   },
   title: {
@@ -110,9 +110,9 @@ const taskSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for efficient queries
-taskSchema.index({ user: 1, category: 1, status: 1 });
-taskSchema.index({ user: 1, dueDate: 1 });
-taskSchema.index({ user: 1, assignedRoles: 1 });
+// Index for efficient queries (user field stores wedding ID)
+taskSchema.index({ user: 1, category: 1, status: 1 }); // weddingId, category, status
+taskSchema.index({ user: 1, dueDate: 1 }); // weddingId, dueDate
+taskSchema.index({ user: 1, assignedRoles: 1 }); // weddingId, assignedRoles
 
 module.exports = mongoose.model('Task', taskSchema); 

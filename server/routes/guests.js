@@ -5,6 +5,7 @@ const fs = require('fs');
 const Guest = require('../models/Guest');
 const { authenticateToken } = require('../utils/auth');
 const User = require('../models/User');
+const Collaborator = require('../models/Collaborator');
 const router = express.Router();
 
 // Configure multer for CSV upload
@@ -27,16 +28,36 @@ router.get('/', authenticateToken, async (req, res) => {
   try {
     const { group, rsvpStatus, search } = req.query;
     
-    const query = { user: req.user._id };
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+    
+    // Handle both old and new guest structures
+    // Old guests: user field contains user ID
+    // New guests: user field contains wedding ID
+    const query = {
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    };
     
     if (group) query.group = group;
     if (rsvpStatus) query.rsvpStatus = rsvpStatus;
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { group: { $regex: search, $options: 'i' } }
-      ];
+      query.$and = [{
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { group: { $regex: search, $options: 'i' } }
+        ]
+      }];
     }
 
     const guests = await Guest.find(query)
@@ -53,8 +74,25 @@ router.get('/', authenticateToken, async (req, res) => {
 // Get guest statistics
 router.get('/stats', authenticateToken, async (req, res) => {
   try {
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     const stats = await Guest.aggregate([
-      { $match: { user: req.user._id } },
+      { 
+        $match: {
+          $or: [
+            { user: userWedding.weddingId._id }, // New structure: wedding ID
+            { user: req.user._id } // Old structure: user ID (for backward compatibility)
+          ]
+        }
+      },
       {
         $group: {
           _id: '$rsvpStatus',
@@ -64,7 +102,14 @@ router.get('/stats', authenticateToken, async (req, res) => {
     ]);
 
     const groupStats = await Guest.aggregate([
-      { $match: { user: req.user._id } },
+      { 
+        $match: {
+          $or: [
+            { user: userWedding.weddingId._id }, // New structure: wedding ID
+            { user: req.user._id } // Old structure: user ID (for backward compatibility)
+          ]
+        }
+      },
       {
         $group: {
           _id: '$group',
@@ -76,9 +121,17 @@ router.get('/stats', authenticateToken, async (req, res) => {
       }
     ]);
 
-    const totalGuests = await Guest.countDocuments({ user: req.user._id });
+    const totalGuests = await Guest.countDocuments({
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    });
     const attendingGuests = await Guest.countDocuments({ 
-      user: req.user._id, 
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ],
       rsvpStatus: 'Attending' 
     });
 
@@ -111,12 +164,22 @@ router.post('/', authenticateToken, async (req, res) => {
       notes
     } = req.body;
 
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     // Validate rsvpStatus enum value
     const validRsvpStatuses = ['Pending', 'Attending', 'Not Attending', 'Maybe'];
     const finalRsvpStatus = rsvpStatus && validRsvpStatuses.includes(rsvpStatus) ? rsvpStatus : 'Pending';
 
     const guest = new Guest({
-      user: req.user._id,
+      user: userWedding.weddingId._id, // Store wedding ID instead of user ID
       name,
       email,
       phone,
@@ -147,8 +210,24 @@ router.put('/:guestId', authenticateToken, async (req, res) => {
     const { guestId } = req.params;
     const updateData = req.body;
 
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     const guest = await Guest.findOneAndUpdate(
-      { _id: guestId, user: req.user._id },
+      { 
+        _id: guestId, 
+        $or: [
+          { user: userWedding.weddingId._id }, // New structure: wedding ID
+          { user: req.user._id } // Old structure: user ID (for backward compatibility)
+        ]
+      },
       updateData,
       { new: true, runValidators: true }
     );
@@ -172,7 +251,23 @@ router.delete('/:guestId', authenticateToken, async (req, res) => {
   try {
     const { guestId } = req.params;
 
-    const guest = await Guest.findOneAndDelete({ _id: guestId, user: req.user._id });
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
+    const guest = await Guest.findOneAndDelete({ 
+      _id: guestId, 
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    });
 
     if (!guest) {
       return res.status(404).json({ error: 'Guest not found' });
@@ -194,8 +289,24 @@ router.put('/bulk/rsvp', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Guest IDs array and RSVP status are required' });
     }
 
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     const result = await Guest.updateMany(
-      { _id: { $in: guestIds }, user: req.user._id },
+      { 
+        _id: { $in: guestIds }, 
+        $or: [
+          { user: userWedding.weddingId._id }, // New structure: wedding ID
+          { user: req.user._id } // Old structure: user ID (for backward compatibility)
+        ]
+      },
       { 
         rsvpStatus,
         rsvpDate: rsvpStatus !== 'Pending' ? new Date() : null
@@ -219,6 +330,16 @@ router.post('/import', authenticateToken, upload.single('csvFile'), async (req, 
       return res.status(400).json({ error: 'CSV file is required' });
     }
 
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
     const guests = [];
     const errors = [];
 
@@ -232,7 +353,7 @@ router.post('/import', authenticateToken, upload.single('csvFile'), async (req, 
         }
 
         const guest = {
-          user: req.user._id,
+          user: userWedding.weddingId._id, // Store wedding ID instead of user ID
           name: row.name.trim(),
           email: row.email ? row.email.trim() : '',
           phone: row.phone ? row.phone.trim() : '',
@@ -314,7 +435,22 @@ router.post('/import', authenticateToken, upload.single('csvFile'), async (req, 
 // Export guests to CSV
 router.get('/export', authenticateToken, async (req, res) => {
   try {
-    const guests = await Guest.find({ user: req.user._id }).sort({ name: 1 });
+    // Find the user's wedding through collaboration
+    const userWedding = await Collaborator.findOne({ 
+      userId: req.user._id,
+      status: 'accepted'
+    }).populate('weddingId');
+
+    if (!userWedding || !userWedding.weddingId) {
+      return res.status(404).json({ error: 'No wedding found for user' });
+    }
+
+    const guests = await Guest.find({
+      $or: [
+        { user: userWedding.weddingId._id }, // New structure: wedding ID
+        { user: req.user._id } // Old structure: user ID (for backward compatibility)
+      ]
+    }).sort({ name: 1 });
 
     const csvData = guests.map(guest => ({
       name: guest.name,

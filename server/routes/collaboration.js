@@ -187,22 +187,28 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
 
     // Check if user already exists
     let invitedUser = await User.findOne({ email: email.toLowerCase() });
+    let userId = null;
     
-    if (!invitedUser) {
-      // Create a placeholder user (they'll complete registration when they accept)
-      invitedUser = new User({
-        email: email.toLowerCase(),
-        name: name,
-        password: 'placeholder' // They'll set this when they accept
-      });
-      await invitedUser.save();
+    if (invitedUser) {
+      // User exists, use their ID
+      userId = invitedUser._id;
     }
+    // If user doesn't exist, we'll create the collaborator record without a userId
+    // The userId will be set when they register and accept the invitation
 
-    // Check if already a collaborator
-    const existingCollaborator = await Collaborator.findOne({ 
-      weddingId, 
-      userId: invitedUser._id 
-    });
+    // Check if already a collaborator (by email for pending invites, by userId for existing users)
+    let existingCollaborator;
+    if (userId) {
+      existingCollaborator = await Collaborator.findOne({ 
+        weddingId, 
+        userId: userId 
+      });
+    } else {
+      existingCollaborator = await Collaborator.findOne({ 
+        weddingId, 
+        email: email.toLowerCase() 
+      });
+    }
 
     if (existingCollaborator) {
       return res.status(400).json({ error: 'User is already a collaborator' });
@@ -213,12 +219,13 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
 
     const collaborator = new Collaborator({
       weddingId,
-      userId: invitedUser._id,
+      userId: userId, // Will be null for new users
       role,
       email: email.toLowerCase(),
       name,
       invitedBy: req.user._id,
-      permissions
+      permissions,
+      status: userId ? 'accepted' : 'pending' // Auto-accept if user exists
     });
 
     await collaborator.save();
@@ -434,6 +441,39 @@ router.post('/join', authenticateToken, async (req, res) => {
       } else if (existingCollaborator.status === 'pending') {
         return res.status(400).json({ error: 'You already have a pending invitation for this wedding' });
       }
+    }
+
+    // Check if there's a pending invitation for this user's email
+    const pendingInvitation = await Collaborator.findOne({
+      weddingId,
+      email: req.user.email.toLowerCase(),
+      status: 'pending',
+      userId: null
+    });
+
+    if (pendingInvitation) {
+      // Link the pending invitation to this user
+      pendingInvitation.userId = req.user._id;
+      pendingInvitation.status = 'accepted';
+      pendingInvitation.acceptedAt = new Date();
+      await pendingInvitation.save();
+
+      res.status(200).json({
+        message: 'Successfully accepted invitation and joined wedding',
+        wedding: {
+          id: wedding._id,
+          name: wedding.name,
+          weddingDate: wedding.weddingDate,
+          venue: wedding.venue,
+          theme: wedding.theme
+        },
+        collaborator: {
+          role: pendingInvitation.role,
+          status: pendingInvitation.status,
+          permissions: pendingInvitation.permissions
+        }
+      });
+      return;
     }
 
     // Get permissions based on role

@@ -23,12 +23,27 @@ const messageSchema = new mongoose.Schema({
   timestamp: {
     type: Date,
     default: Date.now
+  },
+  type: {
+    type: String,
+    enum: ['group', 'individual'],
+    default: 'group'
+  },
+  recipientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: function() {
+      return this.type === 'individual';
+    }
   }
 }, {
   timestamps: true
 });
 
-// Index for efficient querying
+// Indexes for efficient querying
 messageSchema.index({ weddingId: 1, timestamp: -1 });
+messageSchema.index({ weddingId: 1, type: 1 });
+messageSchema.index({ senderId: 1, recipientId: 1 });
+messageSchema.index({ recipientId: 1, senderId: 1 });
 
 module.exports = mongoose.model('Message', messageSchema); 
