@@ -16,19 +16,26 @@ export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [token, setToken] = useState('')
+  const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const tokenParam = searchParams.get('token')
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
+    const tokenParam = searchParams?.get('token')
     if (!tokenParam) {
       toast.error('Invalid reset link')
       router.push('/login')
       return
     }
     setToken(tokenParam)
-  }, [searchParams, router])
+  }, [searchParams, router, isClient])
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
@@ -115,11 +122,14 @@ export default function ResetPasswordPage() {
     )
   }
 
-  if (!token) {
+  if (!isClient || !token) {
     return (
       <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-gray-600">Loading...</p>
+          <div className="flex justify-center">
+            <Heart className="w-12 h-12 text-primary-600" />
+          </div>
+          <p className="text-gray-600 mt-4">Loading...</p>
         </div>
       </div>
     )
