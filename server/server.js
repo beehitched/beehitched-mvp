@@ -15,6 +15,9 @@ const messageRoutes = require('./routes/messages');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for rate limiting behind load balancers/proxies
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(cors({

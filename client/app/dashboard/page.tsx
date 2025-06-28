@@ -238,7 +238,21 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-serif font-bold text-gray-900 mb-2">
             Welcome to BeeHitched
           </h1>
-          <p className="text-gray-600">Please sign in to access your dashboard.</p>
+          <p className="text-gray-600 mb-6">Please sign in to access your dashboard.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              href="/"
+              className="bg-primary-600 text-white py-3 px-6 rounded-lg hover:bg-primary-700 transition-colors font-medium"
+            >
+              Return Home
+            </Link>
+            <Link 
+              href="/login"
+              className="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
+            >
+              Sign In
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -303,6 +317,34 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
+      
+      {/* Etsy Shop Promo Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 px-4"
+      >
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <Gift className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">🎉 50% OFF Wedding Templates!</h3>
+              <p className="text-sm text-white/90">Digital wedding templates & more at BeeHitchedCo</p>
+            </div>
+          </div>
+          <a
+            href="https://www.etsy.com/shop/BeeHitchedCo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white text-purple-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center space-x-2"
+          >
+            <span>Shop Now</span>
+            <ChevronRight className="w-4 h-4" />
+          </a>
+        </div>
+      </motion.div>
       
       <div className="container mx-auto px-4 py-8">
         {/* Wedding Selector */}
