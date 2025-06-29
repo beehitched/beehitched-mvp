@@ -45,8 +45,8 @@ export default function RegisterPage() {
         password: formData.password
       })
       
-      // Registration successful, redirect to wedding setup
-      router.push('/setup-wedding')
+      // Registration successful, redirect to dashboard
+      router.push('/dashboard')
     } catch (error: any) {
       setError(error.response?.data?.error || 'Registration failed')
     } finally {
