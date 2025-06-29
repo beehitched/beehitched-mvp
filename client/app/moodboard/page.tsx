@@ -154,7 +154,7 @@ function SortableImage({ image, onEdit, onDelete }: {
       {...listeners}
     >
       <img
-        src={image.url}
+        src={`/api/uploads/moodboards/${image.filename}`}
         alt={image.originalName}
         className="w-full aspect-square object-cover rounded-lg cursor-move"
         onClick={onEdit}
@@ -650,7 +650,7 @@ export default function MoodboardPage() {
                       {moodboard.images.slice(0, 4).map((image, index) => (
                         <div key={image._id} className="aspect-square bg-gray-100 rounded overflow-hidden">
                           <img
-                            src={image.url}
+                            src={`/api/uploads/moodboards/${image.filename}`}
                             alt={image.originalName}
                             className="w-full h-full object-cover"
                           />
@@ -878,7 +878,7 @@ export default function MoodboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <img
-                  src={selectedImage.url}
+                  src={`/api/uploads/moodboards/${selectedImage.filename}`}
                   alt={selectedImage.originalName}
                   className="w-full rounded-lg"
                 />

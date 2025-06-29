@@ -198,20 +198,27 @@ router.post('/:weddingId/invite', authenticateToken, async (req, res) => {
 
     // Check if already a collaborator (by email for pending invites, by userId for existing users)
     let existingCollaborator;
+    
+    // First check by email (this catches both existing users and pending invites)
+    existingCollaborator = await Collaborator.findOne({ 
+      weddingId, 
+      email: email.toLowerCase() 
+    });
+
+    if (existingCollaborator) {
+      return res.status(400).json({ error: 'User is already a collaborator' });
+    }
+
+    // If user exists, also check by userId to be extra safe
     if (userId) {
       existingCollaborator = await Collaborator.findOne({ 
         weddingId, 
         userId: userId 
       });
-    } else {
-      existingCollaborator = await Collaborator.findOne({ 
-        weddingId, 
-        email: email.toLowerCase() 
-      });
-    }
-
-    if (existingCollaborator) {
-      return res.status(400).json({ error: 'User is already a collaborator' });
+      
+      if (existingCollaborator) {
+        return res.status(400).json({ error: 'User is already a collaborator' });
+      }
     }
 
     // Set permissions based on role

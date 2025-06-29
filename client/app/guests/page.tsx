@@ -821,7 +821,7 @@ export default function GuestsPage() {
                         {importPreview.map((row, index) => (
                           <tr key={index}>
                             {Object.values(row).map((value, i) => (
-                              <td key={`${index}-${i}`} className="p-2 border-b">{String(value)}</td>
+                              <td key={i} className="p-2 border-b">{String(value)}</td>
                             ))}
                           </tr>
                         ))}

@@ -71,8 +71,8 @@ const collaboratorSchema = new mongoose.Schema({
 });
 
 // Indexes for efficient queries
-collaboratorSchema.index({ weddingId: 1, userId: 1 }, { unique: true, sparse: true });
-collaboratorSchema.index({ weddingId: 1, email: 1 });
+collaboratorSchema.index({ weddingId: 1, userId: 1 }, { sparse: true });
+collaboratorSchema.index({ weddingId: 1, email: 1 }, { unique: true });
 collaboratorSchema.index({ userId: 1 }, { sparse: true });
 
 module.exports = mongoose.model('Collaborator', collaboratorSchema); 
