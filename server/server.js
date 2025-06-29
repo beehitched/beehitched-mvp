@@ -11,6 +11,7 @@ const guestRoutes = require('./routes/guests');
 const weddingRoutes = require('./routes/weddings');
 const collaborationRoutes = require('./routes/collaboration');
 const messageRoutes = require('./routes/messages');
+const moodboardRoutes = require('./routes/moodboards');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -51,6 +52,10 @@ app.use('/api/guests', guestRoutes);
 app.use('/api/weddings', weddingRoutes);
 app.use('/api/collaboration', collaborationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/moodboards', moodboardRoutes);
+
+// Serve uploaded files
+app.use('/api/uploads', express.static('uploads'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

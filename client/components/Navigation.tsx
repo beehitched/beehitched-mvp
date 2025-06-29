@@ -14,7 +14,8 @@ import {
   Menu,
   X,
   User,
-  Crown
+  Crown,
+  Image
 } from 'lucide-react'
 import RoleBadge from './RoleBadge'
 
@@ -31,6 +32,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { href: '/timeline', label: 'Timeline', icon: Calendar },
     { href: '/guests', label: 'Guests', icon: Users },
     { href: '/vendors', label: 'Vendors', icon: Building2 },
+    { href: '/moodboard', label: 'Moodboard', icon: Image },
     { href: '/settings', label: 'Settings', icon: Settings }
   ]
 
