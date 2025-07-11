@@ -154,10 +154,19 @@ function SortableImage({ image, onEdit, onDelete }: {
       {...listeners}
     >
       <img
-        src={`/api/uploads/moodboards/${image.filename}`}
+        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/uploads/moodboards/${image.filename}`}
         alt={image.originalName}
         className="w-full aspect-square object-cover rounded-lg cursor-move"
         onClick={onEdit}
+        onError={(e) => {
+          console.error('Failed to load image:', image.filename);
+          console.error('Image URL:', `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/uploads/moodboards/${image.filename}`);
+          const target = e.target as HTMLImageElement;
+          target.style.display = 'none';
+        }}
+        onLoad={() => {
+          console.log('Successfully loaded image:', image.filename);
+        }}
       />
       
       {/* Drag Handle */}

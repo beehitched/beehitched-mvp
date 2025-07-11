@@ -225,8 +225,13 @@ router.post('/:moodboardId/images', authenticateToken, upload.array('images', 10
     const uploadedImages = [];
     
     if (req.files && req.files.length > 0) {
+      console.log('Uploading files:', req.files.length);
       for (const file of req.files) {
-        const imageUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/api/uploads/moodboards/${file.filename}`;
+        console.log('Processing file:', file.filename);
+        console.log('File path:', file.path);
+        console.log('File exists:', fs.existsSync(file.path));
+        
+        const imageUrl = `${process.env.CLIENT_URL || 'http://localhost:5000'}/api/uploads/moodboards/${file.filename}`;
         
         const imageData = {
           filename: file.filename,
@@ -298,9 +303,12 @@ router.delete('/:moodboardId/images/:imageId', authenticateToken, async (req, re
     }
 
     // Delete image file from filesystem
-    const imagePath = path.join('uploads/moodboards', image.filename);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
+    const image = moodboard.images.id(imageId);
+    if (image) {
+      const imagePath = path.join('uploads/moodboards', image.filename);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
     moodboard.images.pull(imageId);
@@ -353,10 +361,15 @@ router.get('/uploads/moodboards/:filename', (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, '../uploads/moodboards', filename);
   
+  console.log('Serving image:', filename);
+  console.log('File path:', filePath);
+  console.log('File exists:', fs.existsSync(filePath));
+  
   if (fs.existsSync(filePath)) {
     res.sendFile(filePath);
   } else {
-    res.status(404).json({ error: 'Image not found' });
+    console.error('Image not found:', filePath);
+    res.status(404).json({ error: 'Image not found', filename, filePath });
   }
 });
 

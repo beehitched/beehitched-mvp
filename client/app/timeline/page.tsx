@@ -465,24 +465,24 @@ export default function TimelinePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="card p-6 mb-8"
+          className="card p-4 sm:p-6 mb-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
+          <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="relative sm:col-span-2 lg:col-span-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
             </div>
             
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
             >
               <option value="all">All Status</option>
               <option value="To Do">To Do</option>
@@ -493,7 +493,7 @@ export default function TimelinePage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
@@ -504,7 +504,7 @@ export default function TimelinePage() {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
             >
               <option value="all">All Roles</option>
               {roles.map(role => (
@@ -519,7 +519,7 @@ export default function TimelinePage() {
                 setCategoryFilter('all')
                 setRoleFilter('all')
               }}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-600 hover:text-gray-800 transition-colors bg-gray-50 hover:bg-gray-100 rounded-lg text-base"
             >
               Clear Filters
             </button>
@@ -529,9 +529,9 @@ export default function TimelinePage() {
         {/* Timeline View */}
         <div className="relative">
           {/* Timeline Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-200 via-primary-300 to-primary-200"></div>
+          <div className="absolute left-4 sm:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-200 via-primary-300 to-primary-200"></div>
           
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             <AnimatePresence>
               {Object.entries(taskGroups).map(([month, monthTasks], monthIndex) => (
                 <motion.div
@@ -542,18 +542,18 @@ export default function TimelinePage() {
                   className="relative"
                 >
                   {/* Month Header */}
-                  <div className="flex items-center mb-6">
-                    <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mr-4 border-4 border-white shadow-lg">
-                      <Calendar className="w-8 h-8 text-primary-600" />
+                  <div className="flex items-center mb-4 sm:mb-6">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary-100 rounded-full flex items-center justify-center mr-3 sm:mr-4 border-4 border-white shadow-lg">
+                      <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-serif font-bold text-gray-900">{month}</h2>
-                      <p className="text-gray-600">{monthTasks.length} task{monthTasks.length !== 1 ? 's' : ''}</p>
+                      <h2 className="text-xl sm:text-2xl font-serif font-bold text-gray-900">{month}</h2>
+                      <p className="text-sm sm:text-base text-gray-600">{monthTasks.length} task{monthTasks.length !== 1 ? 's' : ''}</p>
                     </div>
                   </div>
 
                   {/* Tasks for this month */}
-                  <div className="space-y-6 ml-20">
+                  <div className="space-y-4 sm:space-y-6 ml-16 sm:ml-20">
                     {monthTasks.map((task, taskIndex) => (
                       <motion.div
                         key={task._id}
@@ -563,16 +563,16 @@ export default function TimelinePage() {
                         className="relative"
                       >
                         {/* Timeline Node */}
-                        <div className="absolute -left-12 top-6 w-6 h-6 bg-white border-4 border-primary-400 rounded-full shadow-lg z-10"></div>
+                        <div className="absolute -left-8 sm:-left-12 top-4 sm:top-6 w-4 h-4 sm:w-6 sm:h-6 bg-white border-4 border-primary-400 rounded-full shadow-lg z-10"></div>
                         
                         {/* Task Card */}
-                        <div className={`card p-6 ml-4 hover:shadow-medium transition-all duration-300 ${
+                        <div className={`card p-4 sm:p-6 ml-2 sm:ml-4 hover:shadow-medium transition-all duration-300 ${
                           task.status === 'Done' ? 'bg-green-50 border-green-200' : 
                           task.status === 'In Progress' ? 'bg-blue-50 border-blue-200' : 
                           'hover:border-primary-300'
                         }`}>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-4 flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                            <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
                               <div className="flex flex-col items-center space-y-2 mt-1">
                                 <button
                                   onClick={() => {
@@ -584,7 +584,7 @@ export default function TimelinePage() {
                                       handleMarkAsInProgress(task._id)
                                     }
                                   }}
-                                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                  className="p-2 sm:p-1 hover:bg-gray-100 rounded transition-colors"
                                   title={task.status === 'Done' ? 'Mark as To Do' : 
                                          task.status === 'In Progress' ? 'Mark as Done' : 
                                          'Mark as In Progress'}
@@ -593,7 +593,7 @@ export default function TimelinePage() {
                                 </button>
                                 
                                 {/* Status Action Buttons */}
-                                <div className="flex flex-col space-y-1">
+                                <div className="flex flex-row sm:flex-col space-x-1 sm:space-x-0 sm:space-y-1">
                                   {task.status !== 'Done' && (
                                     <button
                                       onClick={() => handleMarkAsDone(task._id)}
@@ -624,29 +624,32 @@ export default function TimelinePage() {
                                 </div>
                               </div>
                               
-                              <div className="flex-1">
-                                <div className="flex items-center space-x-3 mb-2">
-                                  <h3 className={`text-lg font-semibold ${
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
+                                  <h3 className={`text-base sm:text-lg font-semibold ${
                                     task.status === 'Done' ? 'line-through text-gray-500' : 'text-gray-900'
                                   }`}>
                                     {task.title}
                                   </h3>
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
-                                    {priorities.find(p => p.value === task.priority)?.label}
-                                  </span>
-                                  <div className="flex items-center space-x-1 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                    {getCategoryIcon(task.category)}
-                                    <span>{task.category}</span>
+                                  <div className="flex flex-wrap gap-2">
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                                      {priorities.find(p => p.value === task.priority)?.label}
+                                    </span>
+                                    <div className="flex items-center space-x-1 text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                      {getCategoryIcon(task.category)}
+                                      <span className="hidden sm:inline">{task.category}</span>
+                                      <span className="sm:hidden">{task.category.slice(0, 3)}</span>
+                                    </div>
                                   </div>
                                 </div>
                                 
-                                <p className={`text-gray-600 mb-3 ${
+                                <p className={`text-sm sm:text-base text-gray-600 mb-3 ${
                                   task.status === 'Done' ? 'line-through' : ''
                                 }`}>
                                   {task.description}
                                 </p>
                                 
-                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm text-gray-500">
                                   <div className="flex items-center">
                                     <Calendar className="w-4 h-4 mr-1" />
                                     Due: {new Date(task.dueDate).toLocaleDateString()}
@@ -668,7 +671,7 @@ export default function TimelinePage() {
                                 
                                 {/* Role Badges */}
                                 {task.assignedRoles && task.assignedRoles.length > 0 && (
-                                  <div className="flex items-center space-x-2 mt-3">
+                                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-3">
                                     <span className="text-xs text-gray-500">Assigned to:</span>
                                     <div className="flex flex-wrap gap-1">
                                       {task.assignedRoles.map((role, index) => (
@@ -680,7 +683,7 @@ export default function TimelinePage() {
                               </div>
                             </div>
                             
-                            <div className="flex items-center space-x-2 ml-4">
+                            <div className="flex items-center justify-end space-x-2 mt-3 sm:mt-0 sm:ml-4">
                               <button
                                 onClick={() => setEditingTask(task)}
                                 className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -724,9 +727,9 @@ export default function TimelinePage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg p-6 w-full max-w-md"
+            className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
           >
-            <h2 className="text-xl font-semibold mb-4">Add New Task</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Add New Task</h2>
             
             <div className="space-y-4">
               <input
@@ -734,22 +737,22 @@ export default function TimelinePage() {
                 placeholder="Task title"
                 value={newTask.title}
                 onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
               
               <textarea
                 placeholder="Task description"
                 value={newTask.description}
                 onChange={(e) => setNewTask({...newTask, description: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 rows={3}
               />
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <select
                   value={newTask.priority}
                   onChange={(e) => setNewTask({...newTask, priority: e.target.value as any})}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 >
                   {priorities.map(priority => (
                     <option key={priority.value} value={priority.value}>{priority.label}</option>
@@ -759,7 +762,7 @@ export default function TimelinePage() {
                 <select
                   value={newTask.category}
                   onChange={(e) => setNewTask({...newTask, category: e.target.value})}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>{category}</option>
@@ -771,7 +774,7 @@ export default function TimelinePage() {
                 type="date"
                 value={newTask.dueDate}
                 onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
               
               <input
@@ -779,20 +782,20 @@ export default function TimelinePage() {
                 placeholder="Assigned to"
                 value={newTask.assignedTo}
                 onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
             </div>
             
-            <div className="flex space-x-3 mt-6">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full sm:flex-1 px-4 py-3 sm:py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddTask}
-                className="flex-1 btn-primary"
+                className="w-full sm:flex-1 btn-primary text-base"
               >
                 Add Task
               </button>
@@ -807,9 +810,9 @@ export default function TimelinePage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg p-6 w-full max-w-md"
+            className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
           >
-            <h2 className="text-xl font-semibold mb-4">Edit Task</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Edit Task</h2>
             
             <div className="space-y-4">
               <input
@@ -817,22 +820,22 @@ export default function TimelinePage() {
                 placeholder="Task title"
                 value={editingTask.title}
                 onChange={(e) => setEditingTask({...editingTask, title: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
               
               <textarea
                 placeholder="Task description"
                 value={editingTask.description}
                 onChange={(e) => setEditingTask({...editingTask, description: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 rows={3}
               />
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <select
                   value={editingTask.priority}
                   onChange={(e) => setEditingTask({...editingTask, priority: e.target.value as any})}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 >
                   {priorities.map(priority => (
                     <option key={priority.value} value={priority.value}>{priority.label}</option>
@@ -842,7 +845,7 @@ export default function TimelinePage() {
                 <select
                   value={editingTask.category}
                   onChange={(e) => setEditingTask({...editingTask, category: e.target.value})}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>{category}</option>
@@ -854,7 +857,7 @@ export default function TimelinePage() {
                 type="date"
                 value={editingTask.dueDate}
                 onChange={(e) => setEditingTask({...editingTask, dueDate: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
               
               <input
@@ -862,14 +865,14 @@ export default function TimelinePage() {
                 placeholder="Assigned to"
                 value={editingTask.assignedTo}
                 onChange={(e) => setEditingTask({...editingTask, assignedTo: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
             </div>
             
-            <div className="flex space-x-3 mt-6">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
               <button
                 onClick={() => setEditingTask(null)}
-                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full sm:flex-1 px-4 py-3 sm:py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-base"
               >
                 Cancel
               </button>
@@ -878,7 +881,7 @@ export default function TimelinePage() {
                   handleUpdateTask(editingTask._id, editingTask)
                   setEditingTask(null)
                 }}
-                className="flex-1 btn-primary"
+                className="w-full sm:flex-1 btn-primary text-base"
               >
                 Update Task
               </button>
@@ -893,10 +896,10 @@ export default function TimelinePage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Complete Task</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">Complete Task</h2>
               <button
                 onClick={() => {
                   setShowCompletionModal(false)
@@ -910,7 +913,7 @@ export default function TimelinePage() {
                     attachments: []
                   })
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 p-2"
               >
                 ✕
               </button>
@@ -931,7 +934,7 @@ export default function TimelinePage() {
                   placeholder="e.g., Grand Ballroom Venue, Sarah's Photography"
                   value={completionDetails.vendorName}
                   onChange={(e) => setCompletionDetails({...completionDetails, vendorName: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                   required
                 />
               </div>
@@ -945,11 +948,11 @@ export default function TimelinePage() {
                   placeholder="Phone, email, or address"
                   value={completionDetails.vendorContact}
                   onChange={(e) => setCompletionDetails({...completionDetails, vendorContact: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Cost
@@ -959,7 +962,7 @@ export default function TimelinePage() {
                     placeholder="e.g., $2,500"
                     value={completionDetails.cost}
                     onChange={(e) => setCompletionDetails({...completionDetails, cost: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                   />
                 </div>
 
@@ -971,7 +974,7 @@ export default function TimelinePage() {
                     type="date"
                     value={completionDetails.dateCompleted}
                     onChange={(e) => setCompletionDetails({...completionDetails, dateCompleted: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                   />
                 </div>
               </div>
@@ -984,7 +987,7 @@ export default function TimelinePage() {
                   placeholder="Any important details, contract terms, or special arrangements..."
                   value={completionDetails.notes}
                   onChange={(e) => setCompletionDetails({...completionDetails, notes: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
                   rows={4}
                 />
               </div>
@@ -1000,7 +1003,7 @@ export default function TimelinePage() {
               </div>
             </div>
             
-            <div className="flex space-x-3 mt-6">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
               <button
                 onClick={() => {
                   setShowCompletionModal(false)
@@ -1014,14 +1017,14 @@ export default function TimelinePage() {
                     attachments: []
                   })
                 }}
-                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full sm:flex-1 px-4 py-3 sm:py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCompletionSubmit}
                 disabled={!completionDetails.vendorName.trim()}
-                className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-base"
               >
                 Mark as Complete
               </button>
@@ -1036,16 +1039,16 @@ export default function TimelinePage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Completion Details</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">Completion Details</h2>
               <button
                 onClick={() => {
                   setShowCompletionDetails(false)
                   setViewingCompletionDetails(null)
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 p-2"
               >
                 ✕
               </button>
@@ -1063,7 +1066,7 @@ export default function TimelinePage() {
             
             {viewingCompletionDetails.completionDetails && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Vendor/Service Provider
@@ -1083,7 +1086,7 @@ export default function TimelinePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Cost
@@ -1129,7 +1132,7 @@ export default function TimelinePage() {
                   setShowCompletionDetails(false)
                   setViewingCompletionDetails(null)
                 }}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-base"
               >
                 Close
               </button>

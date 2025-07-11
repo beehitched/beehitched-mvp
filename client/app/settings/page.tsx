@@ -17,7 +17,9 @@ import {
   Save,
   Camera,
   Users,
-  UserPlus
+  UserPlus,
+  MessageCircle,
+  CheckCircle
 } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import InviteCollaboratorModal from '@/components/InviteCollaboratorModal'
@@ -121,6 +123,16 @@ export default function SettingsPage() {
     newPassword: '',
     confirmPassword: ''
   })
+
+  // Contact form
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  })
+  const [contactLoading, setContactLoading] = useState(false)
+  const [contactSuccess, setContactSuccess] = useState(false)
 
   // Collaboration
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
@@ -413,6 +425,30 @@ export default function SettingsPage() {
     }
   }
 
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setContactLoading(true)
+    
+    try {
+      // For now, we'll just simulate sending the email
+      // In a real implementation, you'd send this to your backend
+      console.log('Contact form submitted:', contactForm)
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setContactSuccess(true)
+      setContactForm({ name: '', email: '', subject: '', message: '' })
+      
+      // Reset success message after 3 seconds
+      setTimeout(() => setContactSuccess(false), 3000)
+    } catch (error) {
+      console.error('Error sending contact form:', error)
+    } finally {
+      setContactLoading(false)
+    }
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen gradient-bg flex items-center justify-center">
@@ -487,7 +523,7 @@ export default function SettingsPage() {
                   { id: 'notifications', label: 'Notifications', icon: Bell },
                   { id: 'security', label: 'Security', icon: Lock },
                   { id: 'collaboration', label: 'Collaboration', icon: Users },
-                  { id: 'invite', label: 'Invite Collaborator', icon: UserPlus }
+                  { id: 'contact', label: 'Contact Us', icon: MessageCircle }
                 ].map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
@@ -933,6 +969,142 @@ export default function SettingsPage() {
                         </div>
                       ))
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Us Tab */}
+              {activeTab === 'contact' && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <MessageCircle className="w-16 h-16 text-primary-600 mx-auto mb-4" />
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Contact Us</h2>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                      Have questions, feedback, or need support? We'd love to hear from you!
+                    </p>
+                  </div>
+
+                  {contactSuccess && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6"
+                    >
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <CheckCircle className="w-5 h-5 text-green-400" />
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-green-800">
+                            Message sent successfully!
+                          </p>
+                          <p className="text-sm text-green-700">
+                            We'll get back to you at {contactForm.email} as soon as possible.
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <form onSubmit={handleContactSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={contactForm.name}
+                          onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={contactForm.email}
+                          onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                          placeholder="your.email@example.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Subject *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={contactForm.subject}
+                        onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                        placeholder="What's this about?"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Message *
+                      </label>
+                      <textarea
+                        required
+                        rows={6}
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
+                        placeholder="Tell us more about your inquiry..."
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4">
+                      <p className="text-sm text-gray-500">
+                        We typically respond within 24 hours
+                      </p>
+                      <motion.button
+                        type="submit"
+                        disabled={contactLoading}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="btn-primary px-8 py-3"
+                      >
+                        {contactLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Send Message
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </form>
+
+                  <div className="mt-8 pt-8 border-t border-gray-200">
+                    <div className="text-center">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">Other Ways to Reach Us</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="flex items-center justify-center space-x-3">
+                          <Mail className="w-5 h-5 text-primary-600" />
+                          <span className="text-gray-700">hello@beehitched.com</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-3">
+                          <MessageCircle className="w-5 h-5 text-primary-600" />
+                          <span className="text-gray-700">Live Chat (Coming Soon)</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}

@@ -198,7 +198,41 @@
 
 .input-focus-effect:focus {
   transform: scale(1.02);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Animated Bees Styles */
+@keyframes beeWingFlap {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3) rotate(20deg);
+    opacity: 1;
+  }
+}
+
+@keyframes beeGlow {
+  0%, 100% {
+    opacity: 0.3;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.6;
+    filter: brightness(1.2);
+  }
+}
+
+.bee-wing-left {
+  animation: beeWingFlap 0.2s ease-in-out infinite;
+}
+
+.bee-wing-right {
+  animation: beeWingFlap 0.2s ease-in-out infinite reverse;
+}
+
+.bee-glow {
+  animation: beeGlow 3s ease-in-out infinite;
 }
 
 /* Send button pulse effect */

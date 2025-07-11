@@ -24,7 +24,8 @@ import {
   Gift,
   Star,
   ChevronRight,
-  Image
+  Image,
+  Globe
 } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
@@ -632,6 +633,36 @@ export default function DashboardPage() {
                   <Image className="w-4 h-4" />
                   Create Moodboard
                 </Link>
+              </div>
+            </motion.div>
+
+            {/* Website Builder */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28 }}
+              className="card p-6"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Wedding Website</h2>
+                <div className="flex items-center gap-2">
+                  <Globe className="w-6 h-6 text-blue-600" />
+                  <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-center py-8">
+                <Globe className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Create Your Wedding Website</h3>
+                <p className="text-gray-600 mb-6">
+                  Build a beautiful, custom wedding website to share with your guests
+                </p>
+                <div className="bg-gray-100 text-gray-500 px-6 py-3 rounded-lg font-medium inline-flex items-center gap-2 cursor-not-allowed">
+                  <Globe className="w-4 h-4" />
+                  Coming Soon
+                </div>
               </div>
             </motion.div>
 

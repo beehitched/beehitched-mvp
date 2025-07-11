@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import { 
   Search,
@@ -179,6 +179,16 @@ export default function VendorsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [favorites, setFavorites] = useState<string[]>([])
+  const [showVendorPopup, setShowVendorPopup] = useState(false)
+
+  // Show popup when component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowVendorPopup(true)
+    }, 500) // Show after 500ms delay
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const filteredVendors = sampleVendors.filter(vendor => {
     const matchesCategory = selectedCategory === 'all' || vendor.category === selectedCategory
@@ -223,6 +233,92 @@ export default function VendorsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
+      
+      {/* Vendor Popup Modal */}
+      <AnimatePresence>
+        {showVendorPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowVendorPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowVendorPopup(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Icon */}
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-gold-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Building2 className="w-8 h-8 text-white" />
+              </div>
+
+              {/* Content */}
+              <div className="text-center">
+                <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">
+                  Vendor Directory Coming Soon!
+                </h2>
+                
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  BeeHitched is working hard to offer a comprehensive directory of trusted vendors for your special day. 
+                  We're carefully curating photographers, florists, venues, and more to ensure you have access to the best professionals in your area.
+                </p>
+
+                <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-xl p-4 mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-2">What to Expect:</h3>
+                  <ul className="text-sm text-gray-600 space-y-1 text-left">
+                    <li className="flex items-center">
+                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                      Verified vendor profiles with reviews
+                    </li>
+                    <li className="flex items-center">
+                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                      Direct booking and communication
+                    </li>
+                    <li className="flex items-center">
+                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                      Price transparency and packages
+                    </li>
+                    <li className="flex items-center">
+                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                      Local and destination vendors
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => setShowVendorPopup(false)}
+                    className="btn-primary flex-1"
+                  >
+                    Got It
+                  </button>
+                  <button
+                    onClick={() => setShowVendorPopup(false)}
+                    className="btn-secondary flex-1"
+                  >
+                    Notify Me When Ready
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
