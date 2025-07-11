@@ -430,20 +430,30 @@ export default function SettingsPage() {
     setContactLoading(true)
     
     try {
-      // For now, we'll just simulate sending the email
-      // In a real implementation, you'd send this to your backend
-      console.log('Contact form submitted:', contactForm)
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setContactSuccess(true)
-      setContactForm({ name: '', email: '', subject: '', message: '' })
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => setContactSuccess(false), 3000)
-    } catch (error) {
+      const response = await fetch(`${API_URL}/contact/submit`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contactForm)
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setContactSuccess(true)
+        setContactForm({ name: '', email: '', subject: '', message: '' })
+        
+        // Reset success message after 5 seconds
+        setTimeout(() => setContactSuccess(false), 5000)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to send message')
+      }
+    } catch (error: any) {
       console.error('Error sending contact form:', error)
+      // You could add a toast notification here for error handling
+      alert(error.message || 'Failed to send message. Please try again.')
     } finally {
       setContactLoading(false)
     }
@@ -1101,7 +1111,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-center space-x-3">
                           <MessageCircle className="w-5 h-5 text-primary-600" />
-                          <span className="text-gray-700">Live Chat (Coming Soon)</span>
+                          <span className="text-gray-700">support@beehitched.com</span>
                         </div>
                       </div>
                     </div>

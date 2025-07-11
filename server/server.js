@@ -13,6 +13,8 @@ const collaborationRoutes = require('./routes/collaboration');
 const messageRoutes = require('./routes/messages');
 const moodboardRoutes = require('./routes/moodboards');
 const weddingWebsiteRoutes = require('./routes/wedding-website');
+const adminRoutes = require('./routes/admin');
+const contactRoutes = require('./routes/contact');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -55,6 +57,8 @@ app.use('/api/timeline', timelineRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/moodboards', moodboardRoutes);
 app.use('/api/wedding-website', weddingWebsiteRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Serve uploaded files
 app.use('/api/uploads', express.static('uploads', {

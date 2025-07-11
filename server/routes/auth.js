@@ -59,7 +59,8 @@ router.post('/register', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
       },
       pendingInvitations: pendingInvitations.length
     });
@@ -102,7 +103,8 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
       }
     });
   } catch (error) {
@@ -119,6 +121,7 @@ router.get('/profile', authenticateToken, async (req, res) => {
         id: req.user._id,
         name: req.user.name,
         email: req.user.email,
+        role: req.user.role,
         lastLogin: req.user.lastLogin
       }
     });
@@ -149,6 +152,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
         id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
+        role: updatedUser.role,
         lastLogin: updatedUser.lastLogin
       }
     });

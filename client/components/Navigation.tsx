@@ -15,7 +15,8 @@ import {
   X,
   User,
   Crown,
-  Image
+  Image,
+  Shield
 } from 'lucide-react'
 import RoleBadge from './RoleBadge'
 
@@ -35,6 +36,11 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { href: '/moodboard', label: 'Moodboard', icon: Image },
     { href: '/settings', label: 'Settings', icon: Settings }
   ]
+
+  // Add admin link if user is admin
+  if (user?.role === 'admin') {
+    navItems.push({ href: '/admin', label: 'Admin', icon: Shield })
+  }
 
   return (
     <nav className={`bg-white shadow-sm border-b ${className}`}>

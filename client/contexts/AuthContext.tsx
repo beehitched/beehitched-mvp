@@ -9,6 +9,7 @@ interface User {
   _id?: string
   name: string
   email: string
+  role?: string
   partnerName?: string
   brideName?: string
   groomName?: string
