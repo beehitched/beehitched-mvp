@@ -93,19 +93,41 @@ export default function HomePage() {
   const [currentTestimonial, setCurrentTestimonial] = React.useState(0)
   const [showMailerLitePopup, setShowMailerLitePopup] = useState(false)
 
-  // MailerLite popup logic for new visitors
+  // MailerLite popup logic - show for every visitor
   useEffect(() => {
-    // Check if visitor hasn't seen the popup before
-    const hasSeenPopup = localStorage.getItem('mailerlite_popup_visitor')
-    
-    if (!hasSeenPopup) {
-      // Show popup after a short delay
+    // Show popup almost immediately for every visitor
+    setTimeout(() => {
+      console.log('Triggering MailerLite popup...')
+      setShowMailerLitePopup(true)
+      
+      // Trigger popup immediately and with multiple attempts
+      const triggerPopup = () => {
+        console.log('Attempting to trigger popup...')
+        
+        // Method 1: Direct window.ml call
+        if (typeof window !== 'undefined' && (window as any).ml) {
+          console.log('Method 1: Direct window.ml call')
+          ;(window as any).ml('show', '159606328378001195')
+        }
+        
+        // Method 2: Check if ml function exists globally
+        if (typeof (window as any).ml !== 'undefined') {
+          console.log('Method 2: Global ml function')
+          ;(window as any).ml('show', '159606328378001195')
+        }
+      }
+      
+      // Trigger immediately
+      triggerPopup()
+      
+      // Also trigger after a short delay to ensure script is loaded
       setTimeout(() => {
-        setShowMailerLitePopup(true)
-        // Mark as seen
-        localStorage.setItem('mailerlite_popup_visitor', 'true')
-      }, 2000) // 2 second delay for homepage
-    }
+        if (typeof window !== 'undefined' && (window as any).ml) {
+          console.log('Method 3: Delayed window.ml call')
+          ;(window as any).ml('show', '159606328378001195')
+        }
+      }, 500) // Reduced from 1000ms to 500ms
+    }, 500) // Reduced from 2000ms to 500ms for faster appearance
   }, [])
 
   const nextTestimonial = () => {
@@ -1191,8 +1213,12 @@ export default function HomePage() {
           dangerouslySetInnerHTML={{
             __html: `
               // Trigger MailerLite popup for new users
+              console.log('MailerLite popup trigger script executing...');
               if (typeof ml !== 'undefined') {
+                console.log('ml function found, triggering popup...');
                 ml('show', '159606328378001195');
+              } else {
+                console.log('ml function not found');
               }
             `
           }}
