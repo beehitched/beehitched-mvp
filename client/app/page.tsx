@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import Script from 'next/script'
 import { 
   Heart, 
   Calendar, 
@@ -90,6 +91,22 @@ const testimonials = [
 export default function HomePage() {
   const { user } = useAuth()
   const [currentTestimonial, setCurrentTestimonial] = React.useState(0)
+  const [showMailerLitePopup, setShowMailerLitePopup] = useState(false)
+
+  // MailerLite popup logic for new visitors
+  useEffect(() => {
+    // Check if visitor hasn't seen the popup before
+    const hasSeenPopup = localStorage.getItem('mailerlite_popup_visitor')
+    
+    if (!hasSeenPopup) {
+      // Show popup after a short delay
+      setTimeout(() => {
+        setShowMailerLitePopup(true)
+        // Mark as seen
+        localStorage.setItem('mailerlite_popup_visitor', 'true')
+      }, 2000) // 2 second delay for homepage
+    }
+  }, [])
 
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
@@ -1150,6 +1167,37 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* MailerLite Script */}
+      <Script
+        id="mailerlite-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
+            .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
+            n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
+            (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
+            ml('account', '1657165');
+          `
+        }}
+      />
+
+      {/* MailerLite Popup Trigger */}
+      {showMailerLitePopup && (
+        <Script
+          id="mailerlite-popup-trigger"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Trigger MailerLite popup for new users
+              if (typeof ml !== 'undefined') {
+                ml('show', '159606328378001195');
+              }
+            `
+          }}
+        />
+      )}
     </div>
   )
 } 

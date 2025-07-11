@@ -10,6 +10,7 @@ interface User {
   name: string
   email: string
   role?: string
+  createdAt?: string
   partnerName?: string
   brideName?: string
   groomName?: string

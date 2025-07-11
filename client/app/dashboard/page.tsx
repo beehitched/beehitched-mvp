@@ -30,6 +30,7 @@ import {
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
 import MessagingSystem from '@/components/MessagingSystem'
+import Script from 'next/script'
 
 interface Task {
   _id: string
@@ -93,6 +94,8 @@ export default function DashboardPage() {
       fetchUserWeddings()
     }
   }, [user, token])
+
+
 
   useEffect(() => {
     if (wedding?.id) {
