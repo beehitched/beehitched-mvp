@@ -25,11 +25,13 @@ import {
   Star,
   ChevronRight,
   Image,
-  Globe
+  Globe,
+  HelpCircle
 } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
 import MessagingSystem from '@/components/MessagingSystem'
+import InviteCollaboratorModal from '@/components/InviteCollaboratorModal'
 import Script from 'next/script'
 
 interface Task {
@@ -86,6 +88,7 @@ export default function DashboardPage() {
   const [guests, setGuests] = useState<Guest[]>([])
   const [collaborators, setCollaborators] = useState<Collaborator[]>([])
   const [myRole, setMyRole] = useState<any>(null)
+  const [showInviteModal, setShowInviteModal] = useState(false)
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
@@ -198,6 +201,33 @@ export default function DashboardPage() {
     declined: guests.filter(g => g.rsvpStatus === 'Not Attending').length,
     maybe: guests.filter(g => g.rsvpStatus === 'Maybe').length,
     withDietaryRestrictions: guests.filter(g => g.dietaryRestrictions).length
+  }
+
+  // Handle invite collaborator
+  const handleInviteCollaborator = async (inviteData: { email: string; name: string; role: string }) => {
+    try {
+      if (!wedding?.id) {
+        throw new Error('No wedding selected')
+      }
+      
+      const response = await fetch(`${API_URL}/collaboration/${wedding.id}/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(inviteData)
+      })
+
+      if (response.ok) {
+        await fetchDashboardData() // Refresh the collaborators list
+      } else {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to send invitation')
+      }
+    } catch (error: any) {
+      throw error
+    }
   }
 
   // Calculate timeline progress
@@ -405,7 +435,16 @@ export default function DashboardPage() {
               className="card p-6"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Event Details</h2>
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-xl font-semibold text-gray-900">Event Details</h2>
+                  <div className="group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                      Update your wedding details in Settings → Wedding Details
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                    </div>
+                  </div>
+                </div>
                 <Calendar className="w-6 h-6 text-primary-600" />
               </div>
               
@@ -500,11 +539,71 @@ export default function DashboardPage() {
               </div>
             </motion.div>
 
-            {/* Guest Summary Card */}
+            {/* Timeline Progress */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              className="card p-6"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Timeline Progress</h2>
+                <CheckCircle className="w-6 h-6 text-primary-600" />
+              </div>
+              
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">Overall Progress</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {timelineStats.total > 0 
+                      ? Math.round((timelineStats.completed / timelineStats.total) * 100)
+                      : 0}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-primary-600 h-3 rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${timelineStats.total > 0 
+                        ? (timelineStats.completed / timelineStats.total) * 100 
+                        : 0}%` 
+                    }}
+                  ></div>
+                </div>
+                <div className="flex justify-between mt-2 text-sm text-gray-600">
+                  <span>{timelineStats.completed} completed</span>
+                  <span>{timelineStats.inProgress} in progress</span>
+                  <span>{timelineStats.upcoming} upcoming</span>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">Upcoming Tasks</h4>
+                <div className="space-y-2">
+                  {upcomingTasks.length > 0 ? (
+                    upcomingTasks.map((task) => (
+                      <div key={task._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-900">{task.title}</p>
+                          <p className="text-sm text-gray-600">
+                            Due {new Date(task.dueDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No upcoming tasks</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Guest Summary Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
               className="card p-6"
             >
               <div className="flex items-center justify-between mb-6">
@@ -567,7 +666,16 @@ export default function DashboardPage() {
               className="card p-6"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Vendor Tracker</h2>
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-xl font-semibold text-gray-900">Vendor Tracker</h2>
+                  <div className="group relative">
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                      Track your vendor bookings and see which services you still need to book for your wedding
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                    </div>
+                  </div>
+                </div>
                 <Building2 className="w-6 h-6 text-green-600" />
               </div>
               
@@ -669,65 +777,7 @@ export default function DashboardPage() {
               </div>
             </motion.div>
 
-            {/* Timeline Progress */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="card p-6"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Timeline Progress</h2>
-                <CheckCircle className="w-6 h-6 text-primary-600" />
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Overall Progress</span>
-                  <span className="text-sm font-medium text-gray-900">
-                    {timelineStats.total > 0 
-                      ? Math.round((timelineStats.completed / timelineStats.total) * 100)
-                      : 0}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
-                    className="bg-primary-600 h-3 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: `${timelineStats.total > 0 
-                        ? (timelineStats.completed / timelineStats.total) * 100 
-                        : 0}%` 
-                    }}
-                  ></div>
-                </div>
-                <div className="flex justify-between mt-2 text-sm text-gray-600">
-                  <span>{timelineStats.completed} completed</span>
-                  <span>{timelineStats.inProgress} in progress</span>
-                  <span>{timelineStats.upcoming} upcoming</span>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3">Upcoming Tasks</h4>
-                <div className="space-y-2">
-                  {upcomingTasks.length > 0 ? (
-                    upcomingTasks.map((task) => (
-                      <div key={task._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{task.title}</p>
-                          <p className="text-sm text-gray-600">
-                            Due {new Date(task.dueDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-gray-500">No upcoming tasks</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
+
           </div>
 
           {/* Right Column */}
@@ -741,7 +791,15 @@ export default function DashboardPage() {
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Collaborators</h2>
-                <UserPlus className="w-6 h-6 text-purple-600" />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowInviteModal(true)}
+                  className="btn-primary text-sm px-4 py-2 flex items-center"
+                >
+                  Add More
+                  <UserPlus className="w-4 h-4 ml-2" />
+                </motion.button>
               </div>
               
               <div className="space-y-4">
@@ -846,6 +904,15 @@ export default function DashboardPage() {
       
       {/* Messaging System */}
       <MessagingSystem collaborators={collaborators} />
+
+      {/* Invite Collaborator Modal */}
+      {showInviteModal && (
+        <InviteCollaboratorModal
+          weddingId={wedding?.id}
+          onClose={() => setShowInviteModal(false)}
+          onInvite={handleInviteCollaborator}
+        />
+      )}
     </div>
   )
 } 

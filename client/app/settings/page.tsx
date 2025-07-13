@@ -425,6 +425,82 @@ export default function SettingsPage() {
     }
   }
 
+  // Individual save functions for each tab
+  const handleSaveProfile = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profile)
+      })
+
+      if (response.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      } else {
+        throw new Error('Failed to save profile')
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSaveWeddingDetails = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/weddings/${currentWeddingId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(weddingDetails)
+      })
+
+      if (response.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      } else {
+        throw new Error('Failed to save wedding details')
+      }
+    } catch (error) {
+      console.error('Error saving wedding details:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSaveNotifications = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/users/notifications`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(notifications)
+      })
+
+      if (response.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      } else {
+        throw new Error('Failed to save notification settings')
+      }
+    } catch (error) {
+      console.error('Error saving notification settings:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setContactLoading(true)
@@ -500,25 +576,13 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">
-                Settings
-              </h1>
-              <p className="text-gray-600">
-                Manage your account and wedding preferences.
-              </p>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleSave}
-              disabled={loading}
-              className="btn-primary mt-4 md:mt-0"
-            >
-              <Save className="w-5 h-5 mr-2" />
-              {loading ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
-            </motion.button>
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">
+              Settings
+            </h1>
+            <p className="text-gray-600">
+              Manage your account and wedding preferences.
+            </p>
           </div>
         </motion.div>
 
@@ -563,7 +627,19 @@ export default function SettingsPage() {
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-semibold text-gray-900">Profile Settings</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold text-gray-900">Profile Settings</h2>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSaveProfile}
+                      disabled={loading}
+                      className="btn-primary"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {loading ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}
+                    </motion.button>
+                  </div>
                   
                   {/* Avatar Upload */}
                   <div className="flex items-center space-x-6">
@@ -677,7 +753,19 @@ export default function SettingsPage() {
               {/* Wedding Details Tab */}
               {activeTab === 'wedding' && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-semibold text-gray-900">Wedding Details</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold text-gray-900">Wedding Details</h2>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSaveWeddingDetails}
+                      disabled={loading}
+                      className="btn-primary"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {loading ? 'Saving...' : saved ? 'Saved!' : 'Save Wedding Details'}
+                    </motion.button>
+                  </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -813,7 +901,19 @@ export default function SettingsPage() {
               {/* Notifications Tab */}
               {activeTab === 'notifications' && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-semibold text-gray-900">Notification Settings</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold text-gray-900">Notification Settings</h2>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSaveNotifications}
+                      disabled={loading}
+                      className="btn-primary"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {loading ? 'Saving...' : saved ? 'Saved!' : 'Save Notifications'}
+                    </motion.button>
+                  </div>
                   
                   <div className="space-y-4">
                     {[
