@@ -96,106 +96,30 @@ export default function GuestsPage() {
 
   const fetchGuests = async () => {
     try {
+      console.log('Fetching guests with token:', token ? 'Token present' : 'No token')
+      console.log('API URL:', `${API_URL}/guests`)
+      
       const response = await fetch(`${API_URL}/guests`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
+      
+      console.log('Response status:', response.status)
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('Guests data:', data)
         setGuests(Array.isArray(data) ? data : [])
       } else {
-        setGuests([
-          {
-            _id: '1',
-            name: 'Sarah Johnson',
-            email: 'sarah.johnson@email.com',
-            phone: '(555) 123-4567',
-            address: '123 Main St, New York, NY',
-            rsvpStatus: 'Attending',
-            plusOne: true,
-            plusOneName: 'Mike Johnson',
-            dietaryRestrictions: 'Vegetarian',
-            notes: 'Childhood friend of the bride',
-            group: 'Bride Friends',
-            createdAt: '2024-01-01'
-          },
-          {
-            _id: '2',
-            name: 'David Smith',
-            email: 'david.smith@email.com',
-            phone: '(555) 987-6543',
-            address: '456 Oak Ave, Los Angeles, CA',
-            rsvpStatus: 'Pending',
-            plusOne: false,
-            plusOneName: '',
-            dietaryRestrictions: '',
-            notes: 'College roommate',
-            group: 'Groom Friends',
-            createdAt: '2024-01-05'
-          },
-          {
-            _id: '3',
-            name: 'Emily Davis',
-            email: 'emily.davis@email.com',
-            phone: '(555) 456-7890',
-            address: '789 Pine Rd, Chicago, IL',
-            rsvpStatus: 'Not Attending',
-            plusOne: false,
-            plusOneName: '',
-            dietaryRestrictions: '',
-            notes: 'Unable to travel due to work',
-            group: 'Work Colleagues',
-            createdAt: '2024-01-10'
-          }
-        ])
+        const errorText = await response.text()
+        console.error('Failed to fetch guests:', response.status, response.statusText)
+        console.error('Error response:', errorText)
+        setGuests([])
       }
     } catch (error) {
       console.error('Error fetching guests:', error)
-      setGuests([
-        {
-          _id: '1',
-          name: 'Sarah Johnson',
-          email: 'sarah.johnson@email.com',
-          phone: '(555) 123-4567',
-          address: '123 Main St, New York, NY',
-          rsvpStatus: 'Attending',
-          plusOne: true,
-          plusOneName: 'Mike Johnson',
-          dietaryRestrictions: 'Vegetarian',
-          notes: 'Childhood friend of the bride',
-          group: 'Bride Friends',
-          createdAt: '2024-01-01'
-        },
-        {
-          _id: '2',
-          name: 'David Smith',
-          email: 'david.smith@email.com',
-          phone: '(555) 987-6543',
-          address: '456 Oak Ave, Los Angeles, CA',
-          rsvpStatus: 'Pending',
-          plusOne: false,
-          plusOneName: '',
-          dietaryRestrictions: '',
-          notes: 'College roommate',
-          group: 'Groom Friends',
-          createdAt: '2024-01-05'
-        },
-        {
-          _id: '3',
-          name: 'Emily Davis',
-          email: 'emily.davis@email.com',
-          phone: '(555) 456-7890',
-          address: '789 Pine Rd, Chicago, IL',
-          rsvpStatus: 'Not Attending',
-          plusOne: false,
-          plusOneName: '',
-          dietaryRestrictions: '',
-          notes: 'Unable to travel due to work',
-          group: 'Work Colleagues',
-          createdAt: '2024-01-10'
-        }
-      ])
+      setGuests([])
     } finally {
       setLoading(false)
     }
@@ -240,8 +164,13 @@ export default function GuestsPage() {
       })
 
       if (response.ok) {
-        const addedGuest = await response.json()
-        setGuests([...guests, addedGuest])
+        const responseData = await response.json()
+        console.log('Guest added successfully:', responseData)
+        
+        // Extract the guest data from the nested structure
+        const addedGuest = responseData.guest || responseData
+        
+        setGuests(prevGuests => [...prevGuests, addedGuest])
         setShowAddModal(false)
         setNewGuest({
           name: '',
@@ -255,6 +184,10 @@ export default function GuestsPage() {
           notes: '',
           group: 'Other'
         })
+      } else {
+        console.error('Failed to add guest:', response.status, response.statusText)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Error details:', errorData)
       }
     } catch (error) {
       console.error('Error adding guest:', error)
@@ -555,7 +488,7 @@ export default function GuestsPage() {
           <AnimatePresence>
             {filteredGuests.map((guest, index) => (
               <motion.div
-                key={guest._id}
+                key={guest._id || `${guest.name}-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -821,7 +754,7 @@ export default function GuestsPage() {
                         {importPreview.map((row, index) => (
                           <tr key={index}>
                             {Object.values(row).map((value, i) => (
-                              <td key={i} className="p-2 border-b">{String(value)}</td>
+                              <td key={`${index}-${i}`} className="p-2 border-b">{String(value)}</td>
                             ))}
                           </tr>
                         ))}

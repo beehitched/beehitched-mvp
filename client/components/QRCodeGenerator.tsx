@@ -15,7 +15,17 @@ export default function QRCodeGenerator({ weddingId, weddingName, onClose }: QRC
   const [copied, setCopied] = useState(false)
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('')
 
-  const rsvpUrl = `${process.env.NEXT_PUBLIC_CLIENT_URL || 'http://localhost:3000'}/rsvp/${weddingId}`
+  // Get the current URL or use environment variable
+  const getClientUrl = () => {
+    if (typeof window !== 'undefined') {
+      // In browser, use the current origin
+      return window.location.origin
+    }
+    // Fallback to environment variable or localhost
+    return process.env.NEXT_PUBLIC_CLIENT_URL || 'http://localhost:3000'
+  }
+
+  const rsvpUrl = `${getClientUrl()}/rsvp/${weddingId}`
 
   useEffect(() => {
     setQrCodeUrl(rsvpUrl)

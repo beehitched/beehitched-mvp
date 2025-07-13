@@ -291,7 +291,7 @@ export default function HomePage() {
                 Organize tasks, track progress, and ensure nothing falls through the cracks.
               </p>
             </motion.div>
-          </div>
+                </div>
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -307,11 +307,11 @@ export default function HomePage() {
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                     </svg>
-                  </div>
+                </div>
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Drag & Drop Simplicity</h3>
                     <p className="text-gray-600">Move tasks between categories with intuitive drag-and-drop. Reorganize your timeline effortlessly as your plans evolve.</p>
-                  </div>
+                </div>
                 </div>
 
                 <div className="flex items-start group">
@@ -396,7 +396,7 @@ export default function HomePage() {
                   {/* Venue Category */}
                   <div className="border border-gray-200 rounded-xl overflow-hidden">
                     <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-3">
-                      <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                         <h4 className="font-semibold text-white flex items-center">
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -404,7 +404,7 @@ export default function HomePage() {
                           Venue & Location
                         </h4>
                         <span className="text-white/90 text-sm">3 tasks</span>
-                      </div>
+                  </div>
                     </div>
                     <div className="p-4 space-y-3">
                       <motion.div 
@@ -415,7 +415,7 @@ export default function HomePage() {
                         <div className="flex items-center justify-between">
                           <div className="font-medium text-gray-900">Book ceremony venue</div>
                           <CheckCircle className="w-5 h-5 text-green-500" />
-                        </div>
+                    </div>
                         <div className="text-sm text-gray-600 mt-1">Completed • March 15</div>
                       </motion.div>
                       <motion.div 
@@ -426,7 +426,7 @@ export default function HomePage() {
                         <div className="flex items-center justify-between">
                           <div className="font-medium text-gray-900">Book reception venue</div>
                           <Clock className="w-5 h-5 text-yellow-500" />
-                        </div>
+                  </div>
                         <div className="text-sm text-gray-600 mt-1">Due: April 1</div>
                       </motion.div>
                       <motion.div 
@@ -437,10 +437,10 @@ export default function HomePage() {
                         <div className="flex items-center justify-between">
                           <div className="font-medium text-gray-900">Finalize catering</div>
                           <Clock className="w-5 h-5 text-blue-500" />
-                        </div>
+                </div>
                         <div className="text-sm text-gray-600 mt-1">Due: April 15</div>
                       </motion.div>
-                    </div>
+              </div>
                   </div>
 
                   {/* Vendors Category */}
@@ -467,7 +467,7 @@ export default function HomePage() {
                           <CheckCircle className="w-5 h-5 text-green-500" />
                         </div>
                         <div className="text-sm text-gray-600 mt-1">Completed • March 10</div>
-                      </motion.div>
+            </motion.div>
                       <motion.div 
                         className="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500 hover:shadow-md transition-shadow cursor-pointer"
                         whileHover={{ scale: 1.02 }}
@@ -993,12 +993,12 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-5xl font-serif font-bold text-gray-900 mb-6">
-                What Couples Are Saying
-              </h2>
+              What Couples Are Saying
+            </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Join thousands of happy couples who planned their perfect wedding with us. 
+              Join thousands of happy couples who planned their perfect wedding with us.
                 See how BeeHitched transformed their wedding planning experience.
-              </p>
+            </p>
             </motion.div>
           </div>
           
@@ -1047,8 +1047,8 @@ export default function HomePage() {
                   </div>
                   <div className="text-left">
                     <p className="font-semibold text-gray-900 text-lg">
-                      {testimonials[currentTestimonial].name}
-                    </p>
+                  {testimonials[currentTestimonial].name}
+                </p>
                     <p className="text-gray-600 text-sm">
                       {testimonials[currentTestimonial].location} • {testimonials[currentTestimonial].weddingDate}
                     </p>

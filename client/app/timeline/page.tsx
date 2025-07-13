@@ -122,7 +122,6 @@ export default function TimelinePage() {
     priority: 'Medium' as const,
     dueDate: '',
     category: 'Other',
-    assignedTo: '',
     assignedRoles: [] as string[]
   })
 
@@ -276,7 +275,6 @@ export default function TimelinePage() {
           priority: 'Medium',
           dueDate: '',
           category: 'Other',
-          assignedTo: '',
           assignedRoles: []
         })
         setShowAddModal(false)
@@ -654,10 +652,6 @@ export default function TimelinePage() {
                                     <Calendar className="w-4 h-4 mr-1" />
                                     Due: {new Date(task.dueDate).toLocaleDateString()}
                                   </div>
-                                  <div className="flex items-center">
-                                    <Users className="w-4 h-4 mr-1" />
-                                    {task.assignedTo}
-                                  </div>
                                   {task.status === 'Done' && task.completionDetails && (
                                     <button
                                       onClick={() => handleViewCompletionDetails(task)}
@@ -777,13 +771,36 @@ export default function TimelinePage() {
                 className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
               
-              <input
-                type="text"
-                placeholder="Assigned to"
-                value={newTask.assignedTo}
-                onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})}
-                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Assigned Roles
+                </label>
+                <div className="space-y-2">
+                  {roles.map(role => (
+                    <label key={role} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newTask.assignedRoles.includes(role)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setNewTask({
+                              ...newTask, 
+                              assignedRoles: [...newTask.assignedRoles, role]
+                            })
+                          } else {
+                            setNewTask({
+                              ...newTask, 
+                              assignedRoles: newTask.assignedRoles.filter(r => r !== role)
+                            })
+                          }
+                        }}
+                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">{role}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
@@ -860,13 +877,36 @@ export default function TimelinePage() {
                 className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
               />
               
-              <input
-                type="text"
-                placeholder="Assigned to"
-                value={editingTask.assignedTo}
-                onChange={(e) => setEditingTask({...editingTask, assignedTo: e.target.value})}
-                className="w-full px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-base"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Assigned Roles
+                </label>
+                <div className="space-y-2">
+                  {roles.map(role => (
+                    <label key={role} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editingTask.assignedRoles.includes(role)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setEditingTask({
+                              ...editingTask, 
+                              assignedRoles: [...editingTask.assignedRoles, role]
+                            })
+                          } else {
+                            setEditingTask({
+                              ...editingTask, 
+                              assignedRoles: editingTask.assignedRoles.filter(r => r !== role)
+                            })
+                          }
+                        }}
+                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">{role}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
