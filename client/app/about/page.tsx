@@ -46,59 +46,59 @@ const values = [
 ]
 
 const stats = [
-  { number: '10,000+', label: 'Happy Couples', icon: Heart },
-  { number: '50,000+', label: 'Guests Managed', icon: Users },
-  { number: '100,000+', label: 'Tasks Completed', icon: CheckCircle },
+  { number: '100+', label: 'Happy Couples', icon: Heart },
+  { number: '10,000+', label: 'Guests Managed', icon: Users },
+  { number: '5,000+', label: 'Tasks Completed', icon: CheckCircle },
   { number: '99.9%', label: 'Uptime', icon: Shield }
 ]
 
 const team = [
   {
-    name: 'Emily Chen',
+    name: 'Elle Witzer',
     role: 'Founder & CEO',
-    bio: 'Former wedding planner turned tech entrepreneur. Emily founded BeeHitched after experiencing the chaos of traditional wedding planning firsthand.',
-    image: '/api/placeholder/150/150'
-  },
-  {
-    name: 'David Rodriguez',
-    role: 'Head of Product',
-    bio: 'Product designer with 8+ years building user-centered experiences. Passionate about making complex workflows feel effortless.',
-    image: '/api/placeholder/150/150'
+    bio: 'Former wedding planner turned tech entrepreneur. Elle founded BeeHitched after experiencing the chaos of traditional wedding planning firsthand.',
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face'
   },
   {
     name: 'Sarah Johnson',
-    role: 'Lead Engineer',
-    bio: 'Full-stack developer who believes technology should solve real problems. Built BeeHitched\'s robust backend and real-time features.',
-    image: '/api/placeholder/150/150'
+    role: 'Head of Product',
+    bio: 'Product designer with 8+ years building user-centered experiences. Passionate about making complex workflows feel effortless.',
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
   },
   {
-    name: 'Michael Chen',
+    name: 'David Rodriguez',
+    role: 'Lead Engineer',
+    bio: 'Full-stack developer who believes technology should solve real problems. Built BeeHitched\'s robust backend and real-time features.',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+  },
+  {
+    name: 'Michael Davis',
     role: 'Head of Design',
     bio: 'UI/UX designer focused on creating beautiful, accessible interfaces. Ensures every interaction with BeeHitched feels magical.',
-    image: '/api/placeholder/150/150'
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
   }
 ]
 
 const milestones = [
   {
-    year: '2023',
+    year: '2024',
     title: 'The Beginning',
     description: 'BeeHitched was born from a simple idea: wedding planning should be beautiful, collaborative, and stress-free.'
   },
   {
-    year: '2024',
-    title: 'First 1,000 Couples',
-    description: 'Reached our first milestone of helping 1,000 couples plan their perfect weddings with our platform.'
+    year: '2025',
+    title: 'First 100 Couples',
+    description: 'Reached our first milestone of helping 100 couples plan their perfect weddings with our platform.'
   },
   {
-    year: '2024',
+    year: '2025',
     title: 'QR Code Innovation',
     description: 'Launched our revolutionary QR code RSVP system, making guest management effortless for couples.'
   },
   {
-    year: '2024',
+    year: '2025',
     title: 'Growing Strong',
-    description: 'Now serving 10,000+ couples worldwide with plans to expand our features and reach.'
+    description: 'Now serving 100+ couples worldwide with plans to expand our features and reach.'
   }
 ]
 
@@ -142,10 +142,10 @@ export default function AboutPage() {
                 BeeHitched was born from a simple yet powerful realization: wedding planning should bring people together, not create stress and chaos.
               </p>
               <p className="text-lg text-gray-600 mb-6">
-                Our founder, Emily, was a wedding planner who saw firsthand how traditional planning methods left couples overwhelmed and disconnected from their loved ones. She dreamed of a platform that would make wedding planning collaborative, beautiful, and actually enjoyable.
+                Our founder, Elle, was a wedding planner who saw firsthand how traditional planning methods left couples overwhelmed and disconnected from their loved ones. She dreamed of a platform that would make wedding planning collaborative, beautiful, and actually enjoyable.
               </p>
               <p className="text-lg text-gray-600">
-                Today, BeeHitched serves thousands of couples worldwide, helping them create not just perfect weddings, but beautiful memories of the planning journey itself.
+                Today, BeeHitched serves hundreds of couples worldwide, helping them create not just perfect weddings, but beautiful memories of the planning journey itself.
               </p>
             </motion.div>
             
@@ -169,7 +169,7 @@ export default function AboutPage() {
                   "We believe every couple deserves to enjoy their wedding planning journey. Our platform transforms what's often a stressful experience into a collaborative celebration of love."
                 </p>
                 <div className="mt-6 text-sm text-gray-600">
-                  — Emily Chen, Founder & CEO
+                  — Elle Witzer, Founder & CEO
                 </div>
               </div>
             </motion.div>
@@ -268,7 +268,7 @@ export default function AboutPage() {
               
               {milestones.map((milestone, index) => (
                 <motion.div
-                  key={milestone.year}
+                  key={`${milestone.year}-${milestone.title}`}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.2 }}
@@ -313,8 +313,12 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="card p-6 text-center"
               >
-                <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <Users className="w-12 h-12 text-gray-400" />
+                <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden">
+                  <img 
+                    src={member.image} 
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
                   {member.name}
@@ -502,7 +506,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 BeeHitched. All rights reserved.</p>
+            <p>&copy; 2025 BeeHitched. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -22,6 +22,30 @@ import {
 } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 
+// Fixed array of authors to prevent hydration mismatches
+const authors = [
+  'Alexandra Thompson',
+  'Marcus Rodriguez',
+  'Isabella Chen',
+  'Nathaniel Garcia',
+  'Sophia Anderson',
+  'Gabriel White',
+  'Olivia Martinez',
+  'Sebastian Lee',
+  'Ava Clark',
+  'Lucas Walker',
+  'Mia Hall',
+  'Ethan Allen',
+  'Charlotte Young',
+  'Noah King',
+  'Amelia Wright',
+  'William Scott',
+  'Harper Torres',
+  'James Nguyen',
+  'Evelyn Hill',
+  'Benjamin Flores'
+]
+
 const categories = [
   { name: 'All', count: 24, active: true },
   { name: 'Wedding Planning', count: 8, active: false },
@@ -37,12 +61,12 @@ const featuredArticles = [
     id: 1,
     title: 'The Ultimate Wedding Planning Timeline: 12 Months to Your Big Day',
     excerpt: 'Planning a wedding can feel overwhelming, but with our comprehensive 12-month timeline, you\'ll have everything organized and stress-free. From booking vendors to final details, we\'ve got you covered.',
-    author: 'Emily Chen',
+    author: authors[0],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-15',
     readTime: '8 min read',
     category: 'Wedding Planning',
-    image: '/api/placeholder/600/400',
+    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&h=400&fit=crop&crop=center',
     featured: true,
     views: 2847,
     likes: 156
@@ -51,12 +75,12 @@ const featuredArticles = [
     id: 2,
     title: '10 Creative Ways to Use QR Codes for Your Wedding RSVPs',
     excerpt: 'Discover innovative ways to incorporate QR codes into your wedding invitations and make RSVP collection effortless. From elegant designs to fun interactive elements.',
-    author: 'Sarah Johnson',
+    author: authors[1],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-12',
     readTime: '6 min read',
     category: 'Guest Management',
-    image: '/api/placeholder/600/400',
+    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&h=400&fit=crop&crop=center',
     featured: true,
     views: 1923,
     likes: 89
@@ -65,12 +89,12 @@ const featuredArticles = [
     id: 3,
     title: 'How to Delegate Wedding Tasks Without Losing Control',
     excerpt: 'Learn the art of wedding task delegation while maintaining your vision. Our expert tips will help you involve family and friends without creating chaos.',
-    author: 'David Rodriguez',
+    author: authors[2],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-10',
     readTime: '7 min read',
     category: 'Wedding Planning',
-    image: '/api/placeholder/600/400',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&h=400&fit=crop&crop=center',
     featured: true,
     views: 1654,
     likes: 72
@@ -82,12 +106,12 @@ const recentArticles = [
     id: 4,
     title: '2024 Wedding Trends: What\'s Hot This Year',
     excerpt: 'From sustainable weddings to intimate celebrations, discover the top wedding trends that are shaping 2024 and how to incorporate them into your special day.',
-    author: 'Michael Chen',
+    author: authors[3],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-08',
     readTime: '5 min read',
     category: 'Wedding Trends',
-    image: '/api/placeholder/400/250',
+    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=250&fit=crop&crop=center',
     views: 1247,
     likes: 45
   },
@@ -95,12 +119,12 @@ const recentArticles = [
     id: 5,
     title: 'Budget-Friendly Wedding Planning: How to Save Without Sacrificing',
     excerpt: 'Planning a beautiful wedding doesn\'t have to break the bank. Learn smart budgeting strategies and creative cost-cutting ideas that won\'t compromise your vision.',
-    author: 'Lisa Wang',
+    author: authors[4],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-05',
     readTime: '9 min read',
     category: 'Budget Tips',
-    image: '/api/placeholder/400/250',
+    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=250&fit=crop&crop=center',
     views: 987,
     likes: 38
   },
@@ -108,12 +132,12 @@ const recentArticles = [
     id: 6,
     title: 'The Complete Guide to Wedding Vendor Contracts',
     excerpt: 'Understanding vendor contracts is crucial for protecting your investment. Learn what to look for, red flags to avoid, and how to negotiate the best terms.',
-    author: 'Emily Chen',
+    author: authors[5],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-03',
     readTime: '10 min read',
     category: 'Vendor Advice',
-    image: '/api/placeholder/400/250',
+    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=250&fit=crop&crop=center',
     views: 756,
     likes: 29
   },
@@ -121,12 +145,12 @@ const recentArticles = [
     id: 7,
     title: 'Creating the Perfect Wedding Timeline with BeeHitched',
     excerpt: 'Master the art of timeline creation using BeeHitched\'s intuitive tools. Learn how to organize tasks, set deadlines, and keep your wedding planning on track.',
-    author: 'Sarah Johnson',
+    author: authors[6],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2024-01-01',
     readTime: '6 min read',
     category: 'Timeline Tips',
-    image: '/api/placeholder/400/250',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=250&fit=crop&crop=center',
     views: 654,
     likes: 23
   },
@@ -134,12 +158,12 @@ const recentArticles = [
     id: 8,
     title: 'Guest List Management: The Do\'s and Don\'ts',
     excerpt: 'Managing your guest list can be one of the most challenging aspects of wedding planning. Learn proven strategies for creating and managing your perfect guest list.',
-    author: 'David Rodriguez',
+    author: authors[7],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2023-12-28',
     readTime: '7 min read',
     category: 'Guest Management',
-    image: '/api/placeholder/400/250',
+    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=250&fit=crop&crop=center',
     views: 543,
     likes: 19
   },
@@ -147,12 +171,12 @@ const recentArticles = [
     id: 9,
     title: 'Wedding Photography: How to Choose the Right Photographer',
     excerpt: 'Your wedding photos will last a lifetime. Learn how to select the perfect photographer, what questions to ask, and how to ensure you get the photos of your dreams.',
-    author: 'Michael Chen',
+    author: authors[8],
     authorImage: '/api/placeholder/40/40',
     publishDate: '2023-12-25',
     readTime: '8 min read',
     category: 'Vendor Advice',
-    image: '/api/placeholder/400/250',
+    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=250&fit=crop&crop=center',
     views: 432,
     likes: 16
   }
@@ -266,9 +290,11 @@ export default function BlogPage() {
                 className="card overflow-hidden hover:shadow-xl transition-shadow group"
               >
                 <div className="relative">
-                  <div className="w-full h-48 bg-gradient-to-br from-primary-100 to-gold-100 flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-primary-600" />
-                  </div>
+                  <img 
+                    src={article.image} 
+                    alt={article.title}
+                    className="w-full h-48 object-cover"
+                  />
                   <div className="absolute top-4 left-4">
                     <span className="px-3 py-1 bg-primary-600 text-white text-xs font-medium rounded-full">
                       Featured
@@ -359,9 +385,11 @@ export default function BlogPage() {
                 className="card overflow-hidden hover:shadow-lg transition-shadow group bg-white"
               >
                 <div className="relative">
-                  <div className="w-full h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <BookOpen className="w-12 h-12 text-gray-400" />
-                  </div>
+                  <img 
+                    src={article.image} 
+                    alt={article.title}
+                    className="w-full h-40 object-cover"
+                  />
                   <div className="absolute top-3 left-3">
                     <span className="px-2 py-1 bg-primary-600 text-white text-xs font-medium rounded">
                       {article.category}
@@ -546,7 +574,7 @@ export default function BlogPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 BeeHitched. All rights reserved.</p>
+            <p>&copy; 2025 BeeHitched. All rights reserved.</p>
           </div>
         </div>
       </footer>

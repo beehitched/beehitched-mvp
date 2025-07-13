@@ -38,15 +38,15 @@ const contactMethods = [
     icon: MessageSquare,
     title: 'Live Chat',
     description: 'Chat with our wedding planning experts in real-time',
-    contact: 'Available 9AM-6PM EST',
-    response: 'Instant response during business hours',
+    contact: 'Coming Soon!',
+    response: 'We\'re working on bringing you instant chat support',
     color: 'bg-green-100 text-green-600'
   },
   {
     icon: Phone,
     title: 'Phone Support',
     description: 'Speak directly with our wedding planning specialists',
-    contact: '+1 (555) 123-4567',
+    contact: '+1 (804) 357-3635',
     response: 'Available Mon-Fri, 9AM-6PM EST',
     color: 'bg-purple-100 text-purple-600'
   }
@@ -395,10 +395,10 @@ export default function ContactPage() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">
-                Visit Our Office
+                Our Business Address
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Want to meet our team in person? We'd love to show you around our beautiful office and discuss your wedding planning needs.
+                While we operate virtually to serve couples nationwide, here's our registered business address for your records.
               </p>
               
               <div className="space-y-6">
@@ -409,9 +409,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Address</h3>
                     <p className="text-gray-600">
-                      123 Wedding Way<br />
-                      Suite 456<br />
-                      New York, NY 10001
+                      1806 Summit Ave<br />
+                      Richmond, VA 23230
                     </p>
                   </div>
                 </div>
@@ -439,7 +438,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
+                    <p className="text-gray-600">+1 (804) 357-3635</p>
                   </div>
                 </div>
               </div>
@@ -453,16 +452,16 @@ export default function ContactPage() {
             >
               <div className="card p-8 bg-gradient-to-br from-primary-50 to-gold-50">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-2">Schedule a Meeting</h3>
-                  <p className="text-gray-600">Book a time to meet with our wedding planning experts</p>
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-2">Schedule a Consultation</h3>
+                  <p className="text-gray-600">Book a virtual meeting with our wedding planning experts</p>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="flex items-center p-4 bg-white/60 rounded-lg">
-                    <Calendar className="w-6 h-6 text-primary-600 mr-3" />
+                    <Globe className="w-6 h-6 text-primary-600 mr-3" />
                     <div>
-                      <div className="font-medium text-gray-900">In-Person Consultation</div>
-                      <div className="text-sm text-gray-600">Meet with our team at our office</div>
+                      <div className="font-medium text-gray-900">Video Consultation</div>
+                      <div className="text-sm text-gray-600">Meet with our team via video call</div>
                     </div>
                   </div>
                   
@@ -677,7 +676,7 @@ export default function ContactPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 BeeHitched. All rights reserved.</p>
+            <p>&copy; 2025 BeeHitched. All rights reserved.</p>
           </div>
         </div>
       </footer>

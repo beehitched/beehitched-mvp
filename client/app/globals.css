@@ -200,6 +200,49 @@
   transform: scale(1.02);
 }
 
+/* Article content styling */
+.article-content {
+  @apply text-gray-800 leading-relaxed;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.article-content h2 {
+  @apply text-2xl font-serif font-bold text-gray-900 mt-12 mb-6;
+  border-bottom: 2px solid #f3e8ff;
+  padding-bottom: 0.5rem;
+}
+
+.article-content h3 {
+  @apply text-xl font-semibold text-gray-900 mt-8 mb-4;
+  color: #7c3aed;
+}
+
+.article-content p {
+  @apply mb-6 text-gray-700;
+}
+
+.article-content ul {
+  @apply mb-8 pl-6;
+  list-style-type: disc;
+}
+
+.article-content li {
+  @apply mb-3 text-gray-700;
+  line-height: 1.6;
+}
+
+.article-content strong {
+  @apply font-semibold text-gray-900;
+  color: #7c3aed;
+}
+
+.article-content .lead {
+  @apply text-xl text-gray-600 font-medium mb-8;
+  line-height: 1.6;
+  font-size: 1.25rem;
+}
+
 /* Animated Bees Styles */
 @keyframes beeWingFlap {
   0%, 100% {

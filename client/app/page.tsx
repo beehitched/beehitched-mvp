@@ -51,7 +51,7 @@ const testimonials = [
     location: 'New York, NY',
     text: 'BeeHitched made our wedding planning so much easier! The timeline feature kept us organized and stress-free. We loved how we could collaborate with our families and keep everyone in the loop.',
     rating: 5,
-    weddingDate: 'June 2024',
+    weddingDate: 'January 2025',
     avatar: 'SM'
   },
   {
@@ -59,7 +59,7 @@ const testimonials = [
     location: 'Los Angeles, CA',
     text: 'The guest management system saved us hours of work. The QR codes were a game-changer - our guests loved how easy it was to RSVP, and everything was perfectly organized for our big day.',
     rating: 5,
-    weddingDate: 'August 2024',
+    weddingDate: 'February 2025',
     avatar: 'ED'
   },
   {
@@ -67,7 +67,7 @@ const testimonials = [
     location: 'Chicago, IL',
     text: 'The collaboration features made planning with our families so much easier. Everyone could contribute while we stayed in control. The moodboard feature helped us visualize our perfect day!',
     rating: 5,
-    weddingDate: 'September 2024',
+    weddingDate: 'March 2025',
     avatar: 'JC'
   },
   {
@@ -75,7 +75,7 @@ const testimonials = [
     location: 'Austin, TX',
     text: 'As a busy couple, we needed something that could keep us organized without adding stress. BeeHitched delivered exactly that - intuitive, beautiful, and incredibly helpful.',
     rating: 5,
-    weddingDate: 'October 2024',
+    weddingDate: 'April 2025',
     avatar: 'AR'
   },
   {
@@ -83,7 +83,7 @@ const testimonials = [
     location: 'Seattle, WA',
     text: 'The vendor sharing features are incredible! Our florist and photographer loved being able to see our moodboards and vision. It made communication so much smoother.',
     rating: 5,
-    weddingDate: 'July 2024',
+    weddingDate: 'May 2025',
     avatar: 'SJ'
   }
 ]
@@ -1094,8 +1094,8 @@ export default function HomePage() {
               className="grid md:grid-cols-4 gap-8"
             >
               <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200">
-                <div className="text-3xl font-bold text-primary-600 mb-2">2,500+</div>
-                <div className="text-gray-600">Happy Couples</div>
+                <div className="text-3xl font-bold text-primary-600 mb-2">100+</div>
+                <div className="text-gray-600">Couples Served</div>
               </div>
               <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200">
                 <div className="text-3xl font-bold text-gold-600 mb-2">4.9/5</div>
@@ -1106,8 +1106,8 @@ export default function HomePage() {
                 <div className="text-gray-600">Would Recommend</div>
               </div>
               <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200">
-                <div className="text-3xl font-bold text-green-600 mb-2">50+</div>
-                <div className="text-gray-600">Cities Served</div>
+                <div className="text-3xl font-bold text-green-600 mb-2">10+</div>
+                <div className="text-gray-600">Cities</div>
               </div>
             </motion.div>
           </div>
@@ -1185,7 +1185,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 BeeHitched. All rights reserved.</p>
+            <p>&copy; 2025 BeeHitched. All rights reserved.</p>
           </div>
         </div>
       </footer>

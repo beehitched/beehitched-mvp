@@ -47,7 +47,7 @@ export default function PrivacyPage() {
               Your privacy is our priority
             </p>
             <p className="text-lg text-white/80">
-              Last updated: January 15, 2024
+              Last updated: July 7th, 2025
             </p>
           </motion.div>
         </div>
@@ -606,11 +606,11 @@ export default function PrivacyPage() {
                       </div>
                       <div className="flex items-center space-x-3">
                         <Phone className="w-5 h-5 text-gray-500" />
-                        <span className="text-gray-700">+1 (555) 123-4567</span>
+                        <span className="text-gray-700">+1 (804) 357-3635</span>
                       </div>
                       <div className="flex items-center space-x-3">
                         <MapPin className="w-5 h-5 text-gray-500" />
-                        <span className="text-gray-700">123 Wedding Way, Suite 100<br />New York, NY 10001</span>
+                        <span className="text-gray-700">1806 Summit Ave<br />Richmond, VA 23230</span>
                       </div>
                     </div>
                     
@@ -695,7 +695,7 @@ export default function PrivacyPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 BeeHitched. All rights reserved.</p>
+            <p>&copy; 2025 BeeHitched. All rights reserved.</p>
           </div>
         </div>
       </footer>

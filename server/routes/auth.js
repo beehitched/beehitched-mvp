@@ -371,7 +371,7 @@ router.post('/forgot-password', async (req, res) => {
           </p>
         </div>
         <div style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px;">
-          <p style="margin: 0;">© 2024 BeeHitched. All rights reserved.</p>
+          <p style="margin: 0;">© 2025 BeeHitched. All rights reserved.</p>
         </div>
       </div>
     `;
