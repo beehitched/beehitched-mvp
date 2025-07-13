@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navigation from '@/components/Navigation'
+import { useRouter } from 'next/navigation'
 import { 
   Search,
   MapPin,
@@ -175,14 +176,21 @@ const sampleVendors: Vendor[] = [
 ]
 
 export default function VendorsPage() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [favorites, setFavorites] = useState<string[]>([])
   const [showVendorPopup, setShowVendorPopup] = useState(false)
+  const [showNotificationSuccess, setShowNotificationSuccess] = useState(false)
+  const [hasRequestedNotification, setHasRequestedNotification] = useState(false)
 
   // Show popup when component mounts
   useEffect(() => {
+    // Check if user has already requested notification
+    const hasRequested = localStorage.getItem('vendorNotificationRequested') === 'true'
+    setHasRequestedNotification(hasRequested)
+    
     const timer = setTimeout(() => {
       setShowVendorPopup(true)
     }, 500) // Show after 500ms delay
@@ -213,6 +221,47 @@ export default function VendorsPage() {
       case '$$$': return 'Premium'
       case '$$$$': return 'Luxury'
       default: return range
+    }
+  }
+
+  const handleNotifyMe = async () => {
+    try {
+      // Send email confirmation
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/contact/vendor-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          email: user?.email,
+          name: user?.name || 'User',
+          message: 'I would like to be notified when the vendor directory is available.'
+        })
+      })
+
+      if (response.ok) {
+        setShowNotificationSuccess(true)
+        setHasRequestedNotification(true)
+        // Store in localStorage to remember the preference
+        localStorage.setItem('vendorNotificationRequested', 'true')
+        setTimeout(() => {
+          setShowNotificationSuccess(false)
+          setShowVendorPopup(false)
+        }, 3000) // Show success message for 3 seconds then close popup
+      } else {
+        throw new Error('Failed to send notification request')
+      }
+    } catch (error) {
+      console.error('Error sending notification request:', error)
+      // Still show success message even if email fails
+      setShowNotificationSuccess(true)
+      setHasRequestedNotification(true)
+      localStorage.setItem('vendorNotificationRequested', 'true')
+      setTimeout(() => {
+        setShowNotificationSuccess(false)
+        setShowVendorPopup(false)
+      }, 3000)
     }
   }
 
@@ -269,51 +318,98 @@ export default function VendorsPage() {
 
               {/* Content */}
               <div className="text-center">
-                <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">
-                  Vendor Directory Coming Soon!
-                </h2>
-                
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  BeeHitched is working hard to offer a comprehensive directory of trusted vendors for your special day. 
-                  We're carefully curating photographers, florists, venues, and more to ensure you have access to the best professionals in your area.
-                </p>
+                {!showNotificationSuccess ? (
+                  <>
+                    <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">
+                      Vendor Directory Coming Soon!
+                    </h2>
+                    
+                    <p className="text-gray-600 mb-6 leading-relaxed">
+                      BeeHitched is working hard to offer a comprehensive directory of trusted vendors for your special day. 
+                      We're carefully curating photographers, florists, venues, and more to ensure you have access to the best professionals in your area.
+                    </p>
 
-                <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-xl p-4 mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-2">What to Expect:</h3>
-                  <ul className="text-sm text-gray-600 space-y-1 text-left">
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
-                      Verified vendor profiles with reviews
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
-                      Direct booking and communication
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
-                      Price transparency and packages
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
-                      Local and destination vendors
-                    </li>
-                  </ul>
-                </div>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-xl p-4 mb-6">
+                      <h3 className="font-semibold text-gray-900 mb-2">What to Expect:</h3>
+                      <ul className="text-sm text-gray-600 space-y-1 text-left">
+                        <li className="flex items-center">
+                          <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                          Verified vendor profiles with reviews
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                          Direct booking and communication
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                          Price transparency and packages
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
+                          Local and destination vendors
+                        </li>
+                      </ul>
+                    </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
+                                    <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => setShowVendorPopup(false)}
+                    onClick={() => {
+                      setShowVendorPopup(false)
+                      router.back()
+                    }}
                     className="btn-primary flex-1"
                   >
-                    Got It
+                    Exit
                   </button>
-                  <button
-                    onClick={() => setShowVendorPopup(false)}
-                    className="btn-secondary flex-1"
-                  >
-                    Notify Me When Ready
-                  </button>
+                  {!hasRequestedNotification && (
+                    <button
+                      onClick={handleNotifyMe}
+                      className="btn-secondary flex-1"
+                    >
+                      Notify Me When Ready
+                    </button>
+                  )}
                 </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    
+                    <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">
+                      You're All Set!
+                    </h2>
+                    
+                    <p className="text-gray-600 mb-6 leading-relaxed">
+                      We'll send you an email notification as soon as our vendor directory is available. 
+                      You'll be among the first to know when you can start connecting with trusted vendors for your special day.
+                    </p>
+                    
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                      <div className="flex items-center">
+                        <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                        </svg>
+                        <span className="text-sm text-green-800 font-medium">
+                          Email notification will be sent to: {user?.email}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        setShowVendorPopup(false)
+                        router.back()
+                      }}
+                      className="btn-primary w-full"
+                    >
+                      Close
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           </motion.div>

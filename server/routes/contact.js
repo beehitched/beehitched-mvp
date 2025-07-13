@@ -131,4 +131,134 @@ router.post('/submit', authenticateToken, async (req, res) => {
   }
 });
 
+// Vendor notification request
+router.post('/vendor-notification', authenticateToken, async (req, res) => {
+  try {
+    const { email, name, message } = req.body;
+
+    // Validate required fields
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Email and name are required' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+
+    // Prepare email content for support
+    const supportEmailContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #fce7f3 0%, #fbbf24 100%); padding: 20px; border-radius: 10px 10px 0 0;">
+          <h1 style="color: #1f2937; margin: 0; text-align: center;">BeeHitched Vendor Directory</h1>
+        </div>
+        
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+          <h2 style="color: #374151; margin-bottom: 20px;">New Vendor Directory Notification Request</h2>
+          
+          <div style="margin-bottom: 20px;">
+            <strong style="color: #374151;">User:</strong> ${name} (${email})
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <strong style="color: #374151;">Request:</strong> Vendor directory notification signup
+          </div>
+          
+          <div style="margin-bottom: 30px;">
+            <strong style="color: #374151;">Message:</strong>
+            <div style="background: #f9fafb; padding: 15px; border-radius: 5px; margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">
+              ${message}
+            </div>
+          </div>
+          
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
+            <p style="color: #6b7280; font-size: 14px; margin: 0;">
+              User ID: ${req.user._id}
+            </p>
+            <p style="color: #6b7280; font-size: 14px; margin: 5px 0 0 0;">
+              Requested on: ${new Date().toLocaleString()}
+            </p>
+          </div>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; color: #6b7280; font-size: 12px;">
+          <p>BeeHitched - Making wedding planning beautiful and simple</p>
+        </div>
+      </div>
+    `;
+
+    // Send notification to support
+    await sendMail({
+      to: 'support@beehitched.com',
+      subject: 'Vendor Directory Notification Request',
+      html: supportEmailContent
+    });
+
+    // Send confirmation email to user
+    const confirmationContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #fce7f3 0%, #fbbf24 100%); padding: 20px; border-radius: 10px 10px 0 0;">
+          <h1 style="color: #1f2937; margin: 0; text-align: center;">BeeHitched</h1>
+        </div>
+        
+        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+          <h2 style="color: #374151; margin-bottom: 20px;">You're on the list! 🎉</h2>
+          
+          <p style="color: #374151; line-height: 1.6; margin-bottom: 20px;">
+            Hi ${name},
+          </p>
+          
+          <p style="color: #374151; line-height: 1.6; margin-bottom: 20px;">
+            Great news! You've successfully signed up to be notified when our vendor directory becomes available. 
+            You'll be among the first to know when you can start connecting with trusted vendors for your special day.
+          </p>
+          
+          <div style="background: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <strong style="color: #374151;">What to expect:</strong>
+            <ul style="color: #6b7280; margin: 10px 0 0 0;">
+              <li>Verified vendor profiles with reviews</li>
+              <li>Direct booking and communication</li>
+              <li>Price transparency and packages</li>
+              <li>Local and destination vendors</li>
+            </ul>
+          </div>
+          
+          <p style="color: #374151; line-height: 1.6; margin-bottom: 20px;">
+            We're working hard to bring you the best vendor directory experience. 
+            In the meantime, continue planning your perfect wedding with our other amazing features!
+          </p>
+          
+          <p style="color: #374151; line-height: 1.6; margin-bottom: 0;">
+            Best regards,<br>
+            The BeeHitched Team
+          </p>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; color: #6b7280; font-size: 12px;">
+          <p>BeeHitched - Making wedding planning beautiful and simple</p>
+        </div>
+      </div>
+    `;
+
+    await sendMail({
+      to: email,
+      subject: 'Vendor Directory Notification Confirmation - BeeHitched',
+      html: confirmationContent
+    });
+
+    res.json({
+      message: 'Notification request submitted successfully',
+      success: true
+    });
+
+  } catch (error) {
+    console.error('Vendor notification request error:', error);
+    res.status(500).json({ 
+      error: 'Failed to submit notification request. Please try again later.',
+      success: false
+    });
+  }
+});
+
 module.exports = router; 
