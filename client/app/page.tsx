@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import Script from 'next/script'
 import { 
   Heart, 
   Calendar, 
@@ -91,44 +90,7 @@ const testimonials = [
 export default function HomePage() {
   const { user } = useAuth()
   const [currentTestimonial, setCurrentTestimonial] = React.useState(0)
-  const [showMailerLitePopup, setShowMailerLitePopup] = useState(false)
 
-  // MailerLite popup logic - show for every visitor
-  useEffect(() => {
-    // Show popup almost immediately for every visitor
-    setTimeout(() => {
-      console.log('Triggering MailerLite popup...')
-      setShowMailerLitePopup(true)
-      
-      // Trigger popup immediately and with multiple attempts
-      const triggerPopup = () => {
-        console.log('Attempting to trigger popup...')
-        
-        // Method 1: Direct window.ml call
-        if (typeof window !== 'undefined' && (window as any).ml) {
-          console.log('Method 1: Direct window.ml call')
-          ;(window as any).ml('show', '159606328378001195')
-        }
-        
-        // Method 2: Check if ml function exists globally
-        if (typeof (window as any).ml !== 'undefined') {
-          console.log('Method 2: Global ml function')
-          ;(window as any).ml('show', '159606328378001195')
-        }
-      }
-      
-      // Trigger immediately
-      triggerPopup()
-      
-      // Also trigger after a short delay to ensure script is loaded
-      setTimeout(() => {
-        if (typeof window !== 'undefined' && (window as any).ml) {
-          console.log('Method 3: Delayed window.ml call')
-          ;(window as any).ml('show', '159606328378001195')
-        }
-      }, 500) // Reduced from 1000ms to 500ms
-    }, 500) // Reduced from 2000ms to 500ms for faster appearance
-  }, [])
 
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
@@ -1190,40 +1152,7 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* MailerLite Script */}
-      <Script
-        id="mailerlite-script"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
-            .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
-            n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
-            (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
-            ml('account', '1657165');
-          `
-        }}
-      />
 
-      {/* MailerLite Popup Trigger */}
-      {showMailerLitePopup && (
-        <Script
-          id="mailerlite-popup-trigger"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Trigger MailerLite popup for new users
-              console.log('MailerLite popup trigger script executing...');
-              if (typeof ml !== 'undefined') {
-                console.log('ml function found, triggering popup...');
-                ml('show', '159606328378001195');
-              } else {
-                console.log('ml function not found');
-              }
-            `
-          }}
-        />
-      )}
     </div>
   )
 } 

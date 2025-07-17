@@ -367,12 +367,12 @@ export default function DashboardPage() {
               <Gift className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg">🎉 50% OFF Wedding Templates!</h3>
-              <p className="text-sm text-white/90">Digital wedding templates & more at BeeHitchedCo</p>
+              <h3 className="font-semibold text-lg">🎉 All wedding apparel 20% off!</h3>
+              <p className="text-sm text-white/90">Beautiful dresses, accessories & more at the BeeHitched shop</p>
             </div>
           </div>
           <a
-            href="https://www.etsy.com/shop/BeeHitchedCo"
+            href="https://shop.beehitched.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white text-pink-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center space-x-2"
